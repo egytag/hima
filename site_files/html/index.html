@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TLS Bot Manager</title>
+    <link rel="stylesheet" href="/x-css/bootstrap-5-support.css" />
+    <style>
+      :root {
+        --bs-body-bg: #04364e;
+        --body-background: #04364e;
+        --fieldset-background: #009688;
+        --legend-color: #ffffff;
+        --label-color: #ffeb3b;
+      }
+    </style>
+  </head>
+  <body class="container" ng-controller="mainController">
+    <h1 class="center white">Welcome TLS Bot Manager</h1>
+    <hr />
+    <table class="table hover">
+      <tr>
+        <th>Bot ID</th>
+        <th>IP</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      <tr ng-repeat="bot in list track by $index">
+        <td>
+          <p class="bold">{{bot.botName}}</p>
+          <p class="brown">{{bot.xid}}</p>
+        </td>
+        <td>
+          <p>{{bot.ip}}</p>
+        </td>
+        <td>
+          <b class="green" ng-show="bot.activated"> Activated </b>
+          <i class="red" ng-hide="bot.activated"> Not Activated </i>
+          <p class="blue">{{bot.activatedKey}}</p>
+        </td>
+        <td>
+          <i-button type="play" ng-hide="bot.activated" label="Activate" ng-click="activate(bot , 'now')"></i-button>
+          <i-button type="play" ng-hide="bot.activated" label="Activate a Day" ng-click="activate(bot , 'day')"></i-button>
+          <i-button type="play" ng-hide="bot.activated" label="Activate a Month" ng-click="activate(bot , 'month')"></i-button>
+          <i-button type="stop" ng-show="bot.activated" label="Stop Activate" ng-click="deactivate(bot)"></i-button>
+        </td>
+      </tr>
+    </table>
+    <script src="/x-js/bootstrap-5-support.js"></script>
+    <script>
+      app.controller('mainController', ($http, $scope, $timeout) => {
+        $scope.search = { db: false, limit: 100 };
+        $scope.copy = function (text) {
+          SOCIALBROWSER.copy(text);
+        };
+        $scope.paste = function () {
+          SOCIALBROWSER.paste();
+        };
+        $scope.list = [];
+        site.serverURL = 'ws://' + document.location.host + '/bots';
+        $scope.wsInit = function () {
+          site.ws(site.serverURL, (server) => {
+            $scope.ws = server;
+            $scope.ws.onOpen = () => {};
+            $scope.ws.onClose = () => {
+              setTimeout(() => {
+                $scope.wsInit();
+              }, 1000 * 5);
+            };
+            $scope.ws.onMessage = (message) => {
+              if (message.type === 'ready') {
+                $scope.ws.ip = message.ip;
+                $scope.ws.uuid = message.uuid;
+                $scope.ws.sendMessage({ type: 'info', isAdmin: true });
+              } else if (message.type === 'clientList') {
+                $scope.list = message.list;
+                console.log($scope.list);
+                $scope.$apply();
+              }
+            };
+          });
+        };
+
+        $scope.wsInit();
+
+        $scope.activate = function (bot, key = '') {
+          $scope.ws.sendMessage({ type: 'activate', xid: bot.xid, activated: true, key: key });
+        };
+        $scope.deactivate = function (bot) {
+          $scope.ws.sendMessage({ type: 'activate', xid: bot.xid, activated: false });
+        };
+      });
+    </script>
+  </body>
+</html>
