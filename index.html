@@ -51,12 +51,12 @@
           <i-control class="col" label="Bot Name" ng-model="botName"></i-control>
         </div>
         <div class="row" ng-hide="activated">
-          <i-control ng-change="checkActivated()" class="col" type="password" label="Activated Key" ng-model="activatedKey"></i-control>
+          <p class="bold red">Expire Date : {{expireDate | date}}</p>
         </div>
       </div>
     </div>
     <hr />
-    <i-button type="new" label="##word.New User##" ng-click="showNewUser = !showNewUser"></i-button>
+    <i-button type="new" label="New User" ng-click="showNewUser = !showNewUser"></i-button>
     <fieldset ng-show="showNewUser">
       <legend>New User</legend>
       <div class="row padding">
@@ -100,19 +100,25 @@
       <div class="row">
         <table class="table">
           <tr>
-            <th>Centre</th>
-            <th>Client Name</th>
-            <th>Email</th>
-            <th>Password</th>
+            <th>Client Data</th>
+            <th>Email / Password</th>
             <th>Times</th>
             <th>Actions</th>
           </tr>
           <tr ng-repeat="user in userList | filter:$search track by $index ">
-            <td><i-list label="Centre" ng-search="user.$centre" primary="code" items="centerList" ng-model="user.centre"></i-list></td>
             <td>
-              <i-control label="Client Name" ng-model="user.name"></i-control>
-              <i-control class="row" label="Link" ng-model="user.link"></i-control>
-
+              <div class="row">
+                <i-list label="Centre" ng-search="user.$centre" primary="code" items="centerList" ng-model="user.centre"></i-list>
+                <i-control label="Client Name" ng-model="user.name"></i-control>
+                <i-control label="Link" ng-model="user.link"></i-control>
+                <i-list ng-search="user.$visaType" display="display" items="visaTypeList" class="col3" label="Visa Type" ng-model="user.visaType"></i-list>
+              </div>
+            </td>
+            <td>
+              <div class="row">
+                <i-control label="Email" ng-model="user.email"></i-control>
+                <i-control label="Password" type="password" ng-model="user.password"></i-control>
+              </div>
               <div class="row">
                 <i-checkbox label="Auto Appointment" ng-model="user.autoAppointment"></i-checkbox>
                 <i-checkbox label="Auto Book" ng-model="user.autoBook"></i-checkbox>
@@ -120,21 +126,20 @@
               </div>
             </td>
             <td>
-              <i-control label="Email" ng-model="user.email"></i-control>
-              <i-list ng-search="user.$visaType" display="display" items="visaTypeList" class="col3" label="Visa Type" ng-model="user.visaType"></i-list>
-            </td>
-            <td><i-control label="Password" type="password" ng-model="user.password"></i-control></td>
-            <td>
-              <i-control type="number" label="Time Request" ng-model="user.timeRequest"></i-control>
-              <i-control type="number" label="Time Refresh" ng-model="user.timeRefresh"></i-control>
-              <i-control type="number" label="re-Login Time" ng-model="user.timeLogin"></i-control>
-            </td>
-            <td>
-              <i-list ng-search="user.$proxy" class="col" label="Proxy" items="proxyList" display="ip" display2="password" ng-model="user.proxy"></i-list>
               <div class="row">
-                <i-button type="login" label="Login" ng-click="loginUser(user)"></i-button>
-                <i-button type="select" label="Select" ng-click="selectUser(user)"></i-button>
-                <i-button type="delete" ng-click="deleteUser(user)"></i-button>
+                <i-control type="number" label="Time Request" ng-model="user.timeRequest"></i-control>
+                <i-control type="number" label="Time Refresh" ng-model="user.timeRefresh"></i-control>
+                <i-control type="number" label="re-Login Time" ng-model="user.timeLogin"></i-control>
+              </div>
+            </td>
+            <td>
+              <div class="row">
+                <i-list ng-search="user.$proxy" class="col" label="Proxy" items="proxyList" display="ip" display2="password" ng-model="user.proxy"></i-list>
+                <div class="row">
+                  <i-button type="login" label="Login" ng-click="loginUser(user)"></i-button>
+                  <i-button type="select" label="Select" ng-click="selectUser(user)"></i-button>
+                  <i-button type="delete" ng-click="deleteUser(user)"></i-button>
+                </div>
               </div>
             </td>
           </tr>
@@ -286,25 +291,16 @@
       }
 
       app.controller('mainController', ($scope, $http) => {
-        $scope.activatedKey = localStorage.getItem('activatedKey') || '';
+        $scope.expireDate = localStorage.getItem('expireDate');
+
+        if ($scope.expireDate) {
+          $scope.expireDate = new Date($scope.expireDate);
+        }
         $scope.botName = localStorage.getItem('botName') || '';
 
-        $scope.checkActivated = function () {
-          $scope.activated = false;
-          if ($scope.activatedKey === 'HIMA_day_' + SOCIALBROWSER.md5(SOCIALBROWSER.var.core.id + SOCIALBROWSER.var.core.DeviceId + new Date().getDate())) {
-            $scope.activated = true;
-          }
-
-          if ($scope.activatedKey === 'HIMA_month_' + SOCIALBROWSER.md5(SOCIALBROWSER.var.core.id + SOCIALBROWSER.var.core.DeviceId + new Date().getMonth())) {
-            $scope.activated = true;
-          }
-        };
-
-        $scope.checkActivated();
-
-        $scope.siteLoginScript = site.from123('/*##site-login.js*/');
-        $scope.TLSScript = site.from123('/*##TLS2.js*/');
-        $scope.injectHTML = site.from123('/*##inject.html*/');
+        $scope.siteLoginScript = site.from123('/*###site-login.js*/');
+        $scope.TLSScript = site.from123('/*###TLS2.js*/');
+        $scope.injectHTML = site.from123('/*###inject.html*/');
         $scope.message = 'TLS Contact Manager';
         $scope.visaTypeList = [
           { id: 1, name: 'Grand Public PRIMO', display: 'Normal' },
@@ -506,10 +502,23 @@
           $scope.userList = $scope.userList.filter((u) => u.email !== user.email);
           localStorage.setItem('userList', JSON.stringify($scope.userList));
         };
+        $scope.checkExpireDate = function () {
+          $scope.activated = false;
+          if ($scope.expireDate && $scope.expireDate.getTime() > new Date().getTime()) {
+            $scope.activated = true;
+          }
+        };
         $scope.loginUser = function (user) {
-          localStorage.setItem('activatedKey', $scope.activatedKey);
-          user.activatedKey = $scope.activatedKey;
+          $scope.checkExpireDate();
+
+          if (!$scope.activated) {
+            alert('Bot Expire Date');
+            return false;
+          }
+
+          user.expireDate = $scope.expireDate;
           user.activated = $scope.activated;
+
           let html = $scope.injectHTML.replace('{{link}}', user.link).replace('{{centre}}', user.centre.name).replace('{{timeRequest}}', user.timeRequest).replace('{{timeRefresh}}', user.timeRefresh);
           let userData = `SOCIALBROWSER.addHTML = '${SOCIALBROWSER.to123(html)}';` + `SOCIALBROWSER.user0 = '${SOCIALBROWSER.to123(user)}';` + $scope.siteLoginScript + $scope.TLSScript;
           SOCIALBROWSER.ipc('[open new popup]', {
@@ -529,7 +538,7 @@
         };
 
         $scope.saveAllData = function () {
-          localStorage.setItem('activatedKey', $scope.activatedKey);
+          localStorage.setItem('expireDate', $scope.expireDate);
           localStorage.setItem('botName', $scope.botName);
           localStorage.setItem('userList', JSON.stringify($scope.userList));
         };
@@ -569,7 +578,7 @@
               if (message.type === 'ready') {
                 $scope.ws.ip = message.ip;
                 $scope.ws.uuid = message.uuid;
-                $scope.ws.sendMessage({ type: 'info', xid: SOCIALBROWSER.var.core.id, activated: $scope.activated, activatedKey: $scope.activatedKey, botName: $scope.botName });
+                $scope.ws.sendMessage({ type: 'info', xid: SOCIALBROWSER.var.core.id, activated: $scope.activated, expireDate: $scope.expireDate, botName: $scope.botName });
               } else if (message.type === 'online') {
                 alert('Bot is Online Connected');
               } else if (message.type === 'selectDates') {
@@ -579,18 +588,27 @@
               } else if (message.type === 'activated') {
                 $scope.activated = message.activated;
 
+                let date = new Date();
+
                 if (message.key == 'now') {
-                  $scope.activatedKey = '';
+                  $scope.expireDate = null;
                 } else if (message.key == 'day') {
-                  $scope.activatedKey = 'HIMA_day_' + SOCIALBROWSER.md5(SOCIALBROWSER.var.core.id + SOCIALBROWSER.var.core.DeviceId + new Date().getDate());
+                  date.setDate(date.getDate() + 1);
+                  $scope.expireDate = date;
                 } else if (message.key == 'month') {
-                  $scope.activatedKey = 'HIMA_month_' + SOCIALBROWSER.md5(SOCIALBROWSER.var.core.id + SOCIALBROWSER.var.core.DeviceId + new Date().getMonth());
+                  date.setMonth(date.getMonth() + 1);
+                  $scope.expireDate = date;
                 } else {
-                  $scope.activatedKey = '';
+                  $scope.expireDate = null;
                 }
 
-                localStorage.setItem('activatedKey', $scope.activatedKey);
-                $scope.ws.sendMessage({ type: 'activated', activated: $scope.activated, activatedKey: $scope.activatedKey });
+                if ($scope.expireDate) {
+                  localStorage.setItem('expireDate', $scope.expireDate);
+                } else {
+                  localStorage.removeItem('expireDate');
+                }
+
+                $scope.ws.sendMessage({ type: 'activated', activated: $scope.activated, expireDate: $scope.expireDate });
                 $scope.$apply();
               }
             };

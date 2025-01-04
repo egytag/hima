@@ -239,7 +239,7 @@
           var user = SOCIALBROWSER.user.email;
           var password = SOCIALBROWSER.user.password;
           // window.chrome.webview.postMessage(loginurl + '@' + user + '@' + password + '@reconnectnow');
-          display('CLICK UNLOCK');
+          display('Appuyez Sur Debloquer');
           setTimeout(function () {
             getdates(url);
           }, SOCIALBROWSER.user.timeRequestS);
@@ -331,7 +331,7 @@
           }
           d = d || dates.pop();
           getCaptcha(d);
-          notify('Date found: ' + d);
+          notify('Date Trouvée: ' + d);
           updateRibbonColor('#fc6f03');
         } else {
           clearInterval(SOCIALBROWSER.bookInterval);
@@ -373,7 +373,7 @@
     if (SOCIALBROWSER.stopRequest || SOCIALBROWSER.bookDone == true) {
       return false;
     }
-    notify('Pending');
+    notify('Attendre la Réponse Du Serveur TLS');
     var c_url =
       'https://fr.tlscontact.com/services/customerservice/api/tls/appointment/book?client=fr&issuer=' +
       region +
@@ -401,12 +401,12 @@
           var msg = JSON.parse(xhr.responseText);
           if (msg.error == 'book_appointment_fail') {
             getdates(url);
-          } else if (msg.status == 'success') {
+          } else if (msg.status == 'Succès') {
             updateRibbonColor('#08fc45');
             repeatSpeech();
             window.location.href = SOCIALBROWSER.user.link.replace('appointment', 'personal');
           } else {
-            console.log('Error Error Error!');
+            console.log('Erreur De Serveur TLS');
             getdates(url);
             updateRibbonColor('#0a308f');
           }
@@ -421,7 +421,7 @@
             notify('Too Many Requests : 429');
             updateRibbonColor('#ff0505');
           } else {
-            notify('Error Error Error! : ' + xhr.status);
+            notify('Erreur De Serveur TLS : ' + xhr.status);
             updateRibbonColor('#ff0505');
           }
           console.log(xhr.responseText);

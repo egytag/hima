@@ -36,10 +36,9 @@
         <td>
           <b class="green" ng-show="bot.activated"> Activated </b>
           <i class="red" ng-hide="bot.activated"> Not Activated </i>
-          <p class="blue">{{bot.activatedKey}}</p>
+          <p class="blue">{{bot.expireDate | date}}</p>
         </td>
         <td>
-          <i-button type="play" ng-hide="bot.activated" label="Activate" ng-click="activate(bot , 'now')"></i-button>
           <i-button type="play" ng-hide="bot.activated" label="Activate a Day" ng-click="activate(bot , 'day')"></i-button>
           <i-button type="play" ng-hide="bot.activated" label="Activate a Month" ng-click="activate(bot , 'month')"></i-button>
           <i-button type="stop" ng-show="bot.activated" label="Stop Activate" ng-click="deactivate(bot)"></i-button>

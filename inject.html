@@ -63,7 +63,10 @@
       font-size: 20px;
       color: #fbf8f8;
     }
-
+    input {
+      height: 20px;
+      font-size: 12px;
+    }
     #textTLSContainer {
       display: flex;
       align-items: center;
@@ -105,42 +108,122 @@
     #ttTLSDiv {
       text-align: center;
     }
+    .row {
+      display: flex;
+      width: 100% !important;
+      padding: 0px !important;
+      margin: 0px !important;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .row::after {
+      content: '' !important;
+      clear: both !important;
+      display: table !important;
+    }
+
+    .col1,
+    .col2,
+    .col3,
+    .col4,
+    .col5,
+    .col6,
+    .col7,
+    .col8,
+    .col9,
+    .col10,
+    .col11,
+    .col12 {
+      vertical-align: top;
+      padding: 0;
+      margin: 0;
+      float: left;
+      display: flex;
+      justify-content: flex-start;
+      align-items: stretch;
+      flex-direction: column;
+      align-content: stretch;
+      flex-wrap: nowrap;
+    }
+
+    .col1 {
+      width: calc(1 / 12 * 100%) !important;
+    }
+
+    .col2 {
+      width: calc(2 / 12 * 100%) !important;
+    }
+
+    .col3 {
+      width: calc(3 / 12 * 100%) !important;
+    }
+
+    .col4 {
+      width: calc(4 / 12 * 100%) !important;
+    }
+
+    .col5 {
+      width: calc(5 / 12 * 100%) !important;
+    }
+
+    .col6 {
+      width: calc(6 / 12 * 100%) !important;
+    }
+
+    .col7 {
+      width: calc(7 / 12 * 100%) !important;
+    }
+
+    .col8 {
+      width: calc(8 / 12 * 100%) !important;
+    }
+
+    .col9 {
+      width: calc(9 / 12 * 100%) !important;
+    }
+
+    .col10 {
+      width: calc(10 / 12 * 100%) !important;
+    }
+
+    .col11 {
+      width: calc(11 / 12 * 100%) !important;
+    }
+
+    .col12 {
+      width: calc(12 / 12 * 100%) !important;
+    }
   </style>
+  <div id="textTLSTitle">HIMA| TLS <span style="font-size: 20px">v2</span></div>
   <h1 class="centre">Centre : {{centre}}</h1>
   <div class="center">
-    <button id="allButtons" onclick="SOCIALBROWSER.share('[TLS]');">Run ALL appointment</button>
-    <button id="selectTLSButton" onclick="SOCIALBROWSER.stopRequest = false;SOCIALBROWSER.getdates();">Run appointment</button>
-    <button id="stopTLSButton" onclick="SOCIALBROWSER.stopRequest = true;">- Stop -</button>
-    <br /><br />
-    <button id="linkTLSButton" onclick="document.location.href = '{{link}}'">appointments</button>
-    <button id="unlockTLSButton" onclick="SOCIALBROWSER.unlock();">UnLock</button>
-    <button id="refreshTLSButton" onclick="document.location.reload()">- Reload -</button>
+    <button id="allButtons" onclick="SOCIALBROWSER.share('[TLS]');">Start All</button>
+    <button id="selectTLSButton" onclick="SOCIALBROWSER.stopRequest = false;SOCIALBROWSER.getdates();">Start Rdv</button>
+    <button id="stopTLSButton" onclick="SOCIALBROWSER.stopRequest = true;">Stop</button>
+    <button id="unlockTLSButton" onclick="SOCIALBROWSER.unlock();">Debloquer</button>
+    <button id="refreshTLSButton" onclick="document.location.reload()">Refresher</button>
   </div>
   <div id="ttTLSDiv">
-    <form id="ttTLSForm" class="none">
-    
-      <div class="none">
-        <label for="offsetConnections">Shifting concurrent connections - S :</label>
-        <input type="number" id="offsetConnections" name="offsetConnections" step="any" value="0.2" required />
-        <br />
-        <label for="useRecaptchaSolver">Utiliser le solveur reCAPTCHA :</label>
-        <input type="checkbox" id="useRecaptchaSolver" name="useRecaptchaSolver" />
-        <br />
-        <button id="testButton">Tester reCAPTCHA</button>
-      </div>
-      <div id="statusT">Statut :</div>
-      <div id="messageZone">Prêt.</div>
-    </form>
+    <form id="ttTLSForm" class="none"></form>
     <form>
-      <label for="refreshTLSTime">Search  every - S :</label>
-      <input type="number" id="refreshTLSTime" name="refreshTLSTime" value="{{timeRequest}}" required />
-      <br />
-      <label for="refreshPageInput">ٌRefresh Page every - S :</label>
-      <input type="number" id="refreshPageInput" name="refreshPageInput" value="{{timeRefresh}}" required />
-      <br />
-      <label for="parallelConnections">Number of simultaneous connections :</label>
-      <input type="number" id="parallelConnections" name="parallelConnections" value="1" required />
-      <br />
+      <div class="row">
+        <div class="col4">
+          <label for="refreshTLSTime">Search s:</label>
+          <input type="number" id="refreshTLSTime" name="refreshTLSTime" value="{{timeRequest}}" required />
+        </div>
+        <div class="col4">
+          <label for="refreshPageInput">Refresher s :</label>
+          <input type="number" id="refreshPageInput" name="refreshPageInput" value="{{timeRefresh}}" required />
+        </div>
+        <div class="col4">
+          <label for="parallelConnections">request :</label>
+          <input type="number" id="parallelConnections" name="parallelConnections" value="1" required />
+        </div>
+      </div>
     </form>
     <div id="textTLSContainer">
       <div id="ribbon">---</div>

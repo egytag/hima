@@ -24,7 +24,7 @@ SOCIALBROWSER.onLoad(() => {
   }, 1000 * 5);
 
   if (!SOCIALBROWSER.allowBot) {
-    alert('Wrong Activated Key', 1000 * 60);
+    alert('Bot Not Activated', 1000 * 60);
     setTimeout(() => {
       window.close();
     }, 1000 * 3);

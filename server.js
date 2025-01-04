@@ -22,7 +22,7 @@ const site = isite({
     },
   },
   security: {
-    keys: ['xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'],
+    keys: ['admin@tls'],
   },
   defaults: {
     features: [],
@@ -119,7 +119,7 @@ site.sendAllClientsToBotManager = function () {
     if (_c.isAdmin) {
       _c.sendMessage({
         type: 'clientList',
-        list: site.ws.clientList.filter((c) => c.xid).map((c) => ({ ip: c.ip, id: c.id, xid: c.xid, activated: c.activated, activatedKey: c.activatedKey , botName : c.botName })),
+        list: site.ws.clientList.filter((c) => c.xid).map((c) => ({ ip: c.ip, id: c.id, xid: c.xid, activated: c.activated, expireDate: c.expireDate, botName: c.botName })),
       });
     }
   });
@@ -143,7 +143,7 @@ site.onWS('bots', (client) => {
       client.xid = message.xid;
       client.isAdmin = message.isAdmin;
       client.activated = message.activated;
-      client.activatedKey = message.activatedKey;
+      client.expireDate = message.expireDate;
       client.botName = message.botName;
 
       site.sendAllClientsToBotManager();
@@ -160,7 +160,7 @@ site.onWS('bots', (client) => {
       });
     } else if (message.type === 'activated') {
       client.activated = message.activated;
-      client.activatedKey = message.activatedKey;
+      client.expireDate = message.expireDate;
       site.sendAllClientsToBotManager();
     } else if (message.type === 'selectDates') {
       site.ws.clientList.forEach((_c) => {
