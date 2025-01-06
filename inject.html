@@ -22,12 +22,12 @@
     }
 
     button {
-      background-color: #051524;
+      background-color: #eb6000;
       color: #fff;
       padding: 8px 12px;
       font-size: 16px;
       border: none;
-      border-radius: 5px;
+      border-radius: 25px;
       cursor: pointer;
     }
 
@@ -58,14 +58,22 @@
       color: #f4f7f9;
       display: inline-flex;
     }
-
+    form {
+      margin: 20px;
+    }
     label {
       font-size: 20px;
       color: #fbf8f8;
     }
     input {
+      margin: 0 auto;
+      width: 80px;
       height: 20px;
-      font-size: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      border-radius: 5px;
+      border: navajowhite;
     }
     #textTLSContainer {
       display: flex;
@@ -198,7 +206,6 @@
       width: calc(12 / 12 * 100%) !important;
     }
   </style>
-  <div id="textTLSTitle">HIMA| TLS <span style="font-size: 20px">v2</span></div>
   <h1 class="centre">Centre : {{centre}}</h1>
   <div class="center">
     <button id="allButtons" onclick="SOCIALBROWSER.share('[TLS]');">Start All</button>
@@ -211,15 +218,15 @@
     <form id="ttTLSForm" class="none"></form>
     <form>
       <div class="row">
-        <div class="col4">
+        <div class="col">
           <label for="refreshTLSTime">Search s:</label>
           <input type="number" id="refreshTLSTime" name="refreshTLSTime" value="{{timeRequest}}" required />
         </div>
-        <div class="col4">
+        <div class="col">
           <label for="refreshPageInput">Refresher s :</label>
           <input type="number" id="refreshPageInput" name="refreshPageInput" value="{{timeRefresh}}" required />
         </div>
-        <div class="col4">
+        <div class="col">
           <label for="parallelConnections">request :</label>
           <input type="number" id="parallelConnections" name="parallelConnections" value="1" required />
         </div>

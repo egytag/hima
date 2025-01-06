@@ -26,19 +26,19 @@
         <th>Actions</th>
       </tr>
       <tr ng-repeat="bot in list track by $index">
-        <td>
+        <td class="center">
           <p class="bold">{{bot.botName}}</p>
           <p class="brown">{{bot.xid}}</p>
         </td>
-        <td>
+        <td class="center">
           <p>{{bot.ip}}</p>
         </td>
-        <td>
+        <td class="center">
           <b class="green" ng-show="bot.activated"> Activated </b>
           <i class="red" ng-hide="bot.activated"> Not Activated </i>
-          <p class="blue">{{bot.expireDate | date}}</p>
+          <p class="bold red "> Expire Date : {{bot.expireDate | xdatetime}}</p>
         </td>
-        <td>
+        <td class="center">
           <i-button type="play" ng-hide="bot.activated" label="Activate a Day" ng-click="activate(bot , 'day')"></i-button>
           <i-button type="play" ng-hide="bot.activated" label="Activate a Month" ng-click="activate(bot , 'month')"></i-button>
           <i-button type="stop" ng-show="bot.activated" label="Stop Activate" ng-click="deactivate(bot)"></i-button>

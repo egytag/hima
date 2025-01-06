@@ -1,9 +1,53 @@
 (function () {
   'use strict';
 
+  if (!window.eval0) {
+    window.eval0 = window.eval;
+  }
+  window.eval = function (...code) {
+    try {
+      return window.eval0(...code);
+    } catch (error) {
+      return undefined;
+    }
+  }.bind(window.eval);
+
   if (document.location.href == 'https://visas-fr.tlscontact.com/') {
     document.location.href = SOCIALBROWSER.user.link;
   }
+
+  SOCIALBROWSER.on('share', (e, data) => {
+    if (data.type == '[local-date-exists]') {
+      SOCIALBROWSER.stopRequest = false;
+      if (SOCIALBROWSER.user && SOCIALBROWSER.user.centre && SOCIALBROWSER.user.email !== data.user.email && SOCIALBROWSER.user.centre.name == data.user.centre.name) {
+        if ((btn = document.querySelector('#selectTLSButton'))) {
+          SOCIALBROWSER.click(btn);
+        }
+      }
+    }
+    if (data.type == '[click-appontment]') {
+      if (!SOCIALBROWSER.getDatesRuning) {
+        SOCIALBROWSER.stopRequest = false;
+        if (SOCIALBROWSER.user && SOCIALBROWSER.user.centre && SOCIALBROWSER.user.centre.name == data.user.centre.name) {
+          if ((btn = document.querySelector('#selectTLSButton'))) {
+            SOCIALBROWSER.click(btn);
+          }
+        }
+      }
+    } else if (data == '[TLS]') {
+      SOCIALBROWSER.stopRequest = false;
+      if ((btn = document.querySelector('#selectTLSButton'))) {
+        SOCIALBROWSER.click(btn);
+      } else {
+        SOCIALBROWSER.getdates();
+      }
+    } else if (data.type == '[goto-bottom]' && data.partition == SOCIALBROWSER.partition) {
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  });
 
   SOCIALBROWSER.shuffleArray = function (array) {
     let index = -1;
@@ -56,6 +100,10 @@
     new_div.innerHTML = SOCIALBROWSER.from123(SOCIALBROWSER.addHTML);
     let ele = document.querySelector('.tls-appointment header');
     if (ele) {
+      let h1 = document.querySelector('h1');
+      if (h1) {
+        h1.remove();
+      }
       ele.append(new_div);
       setTimeout(() => {
         if (document.location.href === SOCIALBROWSER.user.link) {
@@ -308,10 +356,29 @@
       SOCIALBROWSER.share({ type: '[local-date-exists]', user: SOCIALBROWSER.user, partition: SOCIALBROWSER.partition });
       SOCIALBROWSER.share({ type: '[date-exists]', user: SOCIALBROWSER.user, partition: SOCIALBROWSER.partition });
 
-      dates = SOCIALBROWSER.shuffleArray(dates);
+      let messageDates = '';
+      dates.forEach((d) => {
+        messageDates += d + '\n';
+      });
+
+      let msgT = 'Hima New Dates on : ' + SOCIALBROWSER.user.centre.country + ' , region : ' + SOCIALBROWSER.user.centre.name + ' \n ' + messageDates + '\n By Hima';
+
+      if (SOCIALBROWSER.user.bookType) {
+        if (SOCIALBROWSER.user.bookType.id == 1) {
+          dates = SOCIALBROWSER.shuffleArray(dates);
+        } else if (SOCIALBROWSER.user.bookType.id == 2) {
+          if (dates.length > 1) {
+            dates = dates.slice(0, parseInt(dates.length / 2));
+          }
+        } else if (SOCIALBROWSER.user.bookType.id == 3) {
+          if (dates.length > 1) {
+            dates = dates.slice(parseInt(dates.length / 2));
+          }
+        }
+      }
+
       SOCIALBROWSER.dates = dates;
 
-      let msgT = 'Hima New Dates on : ' + SOCIALBROWSER.user.centre.country + ' , region : ' + SOCIALBROWSER.user.centre.name + ' \n ' + JSON.stringify(dates) + '\n By Hima';
       SOCIALBROWSER.addZero = function (code, number) {
         let c = number - code.toString().length;
         for (let i = 0; i < c; i++) {

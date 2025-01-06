@@ -1,3 +1,4 @@
+
 if (SOCIALBROWSER.user0) {
   SOCIALBROWSER.user = JSON.parse(SOCIALBROWSER.from123(SOCIALBROWSER.user0));
 }
@@ -12,6 +13,7 @@ SOCIALBROWSER.user.timeRefresh = parseInt(SOCIALBROWSER.user.timeRefresh) || 60 
 SOCIALBROWSER.user.timeLogin = parseInt(SOCIALBROWSER.user.timeLogin) || 60 * 60; ///en seconde
 
 SOCIALBROWSER.onLoad(() => {
+  SOCIALBROWSER.__showBotImage();
   setInterval(() => {
     document.title = 'Client : ' + SOCIALBROWSER.user.name + '  , Email : ' + SOCIALBROWSER.user.email;
   }, 1000 * 1);
@@ -20,6 +22,10 @@ SOCIALBROWSER.onLoad(() => {
     let ele = document.querySelector('#tls-news-banner');
     if (ele) {
       ele.remove();
+    }
+    let cookieEle = document.querySelector('.osano-cm-accept-all');
+    if (cookieEle) {
+      SOCIALBROWSER.click(cookieEle);
     }
   }, 1000 * 5);
 

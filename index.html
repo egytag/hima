@@ -28,35 +28,64 @@
       i-datetime p {
         background: #fff;
       }
+      .btn-light {
+        --bs-btn-color: #ffffff;
+        --bs-btn-bg: #0d6efd;
+        --bs-btn-border-color: #0d6efd;
+        --bs-btn-hover-color: #ffffff;
+        --bs-btn-hover-bg: #279f27;
+        --bs-btn-hover-border-color: #22684f;
+        --bs-btn-focus-shadow-rgb: 211, 212, 213;
+        --bs-btn-active-color: #ffffff;
+        --bs-btn-active-bg: #32b153;
+        --bs-btn-active-border-color: #babbbc;
+        --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+        --bs-btn-disabled-color: #000;
+        --bs-btn-disabled-bg: #f8f9fa;
+        --bs-btn-disabled-border-color: #f8f9fa;
+      }
     </style>
   </head>
   <body class="container loaded" ng-controller="mainController">
     <div class="row top-header">
-      <div class="col3">
+      <div class="col4">
         <table class="table">
           <tr>
-            <td><p class="center">Online Activated</p></td>
+            <td><p class="center">Online</p></td>
+            <td>
+              <p ng-show="online" class="center bold green">Yes</p>
+              <p ng-hide="online" class="center bold red">No</p>
+            </td>
+          </tr>
+          <tr>
+            <td><p class="center">Activated</p></td>
             <td>
               <p ng-show="activated" class="center bold green">Yes</p>
               <p ng-hide="activated" class="center bold red">No</p>
             </td>
           </tr>
+          <tr>
+            <td><p class="center">Expire Date</p></td>
+            <td>
+              <p class="bold red center">{{expireDate | xdatetime}}</p>
+            </td>
+          </tr>
         </table>
       </div>
-      <div class="col6">
+      <div class="col5">
         <h1 class="bold white center">{{message}}</h1>
       </div>
       <div class="col3">
         <div class="row">
           <i-control class="col" label="Bot Name" ng-model="botName"></i-control>
         </div>
-        <div class="row" ng-hide="activated">
-          <p class="bold red">Expire Date : {{expireDate | date}}</p>
+        <div class="row">
+          <i-button type="save" label="Save ALL" ng-click="saveAllData()"></i-button>
         </div>
       </div>
     </div>
     <hr />
-    <i-button type="new" label="New User" ng-click="showNewUser = !showNewUser"></i-button>
+    <i-button label="Add New User" ng-click="showNewUser = !showNewUser" class="center"></i-button>
     <fieldset ng-show="showNewUser">
       <legend>New User</legend>
       <div class="row padding">
@@ -78,7 +107,11 @@
             <i-datetime class="col" label="Select Book Time" ng-model="user0.bookTime"></i-datetime>
           </div>
         </div>
-        <i-control class="row" label="Link" ng-model="user0.link"></i-control>
+        <div class="row">
+          <i-list primary="id" items="bookTypeList" class="col3" label="Book Type" ng-model="user0.bookType"></i-list>
+          <i-control class="col9" label="Link" ng-model="user0.link"></i-control>
+        </div>
+
         <i-button type="push" label="Add To User List" ng-click="addUser(user0)"></i-button>
       </div>
     </fieldset>
@@ -102,7 +135,7 @@
           <tr>
             <th>Client Data</th>
             <th>Email / Password</th>
-            <th>Times</th>
+            <th ng-show="user0.$edit == true">Times</th>
             <th>Actions</th>
           </tr>
           <tr ng-repeat="user in userList | filter:$search track by $index ">
@@ -110,57 +143,55 @@
               <div class="row">
                 <i-list label="Centre" ng-search="user.$centre" primary="code" items="centerList" ng-model="user.centre"></i-list>
                 <i-control label="Client Name" ng-model="user.name"></i-control>
-                <i-control label="Link" ng-model="user.link"></i-control>
-                <i-list ng-search="user.$visaType" display="display" items="visaTypeList" class="col3" label="Visa Type" ng-model="user.visaType"></i-list>
+                <i-control ng-show="user.$edit == true" label="Link" ng-model="user.link"></i-control>
+                <i-list ng-show="user.$edit == true" ng-search="user.$visaType" display="display" items="visaTypeList" class="col3" label="Visa Type" ng-model="user.visaType"></i-list>
               </div>
             </td>
             <td>
               <div class="row">
                 <i-control label="Email" ng-model="user.email"></i-control>
-                <i-control label="Password" type="password" ng-model="user.password"></i-control>
+                <i-control ng-show="user.$edit == true" label="Password" type="password" ng-model="user.password"></i-control>
+                <i-list ng-search="user.$proxy" class="col" label="Proxy" items="proxyList" display="ip" display2="password" ng-model="user.proxy"></i-list>
               </div>
-              <div class="row">
+              <div class="row" ng-show="user.$edit == true">
                 <i-checkbox label="Auto Appointment" ng-model="user.autoAppointment"></i-checkbox>
                 <i-checkbox label="Auto Book" ng-model="user.autoBook"></i-checkbox>
                 <i-datetime label="Select Book Time" ng-model="user.bookTime"></i-datetime>
               </div>
             </td>
-            <td>
+            <td ng-show="user.$edit == true">
               <div class="row">
                 <i-control type="number" label="Time Request" ng-model="user.timeRequest"></i-control>
                 <i-control type="number" label="Time Refresh" ng-model="user.timeRefresh"></i-control>
                 <i-control type="number" label="re-Login Time" ng-model="user.timeLogin"></i-control>
+                <i-list primary="id" items="bookTypeList" class="col" label="Book Type" ng-model="user.bookType"></i-list>
               </div>
             </td>
             <td>
               <div class="row">
-                <i-list ng-search="user.$proxy" class="col" label="Proxy" items="proxyList" display="ip" display2="password" ng-model="user.proxy"></i-list>
-                <div class="row">
-                  <i-button type="login" label="Login" ng-click="loginUser(user)"></i-button>
-                  <i-button type="select" label="Select" ng-click="selectUser(user)"></i-button>
-                  <i-button type="delete" ng-click="deleteUser(user)"></i-button>
-                </div>
+                <i-button type="login" label="Login" ng-click="loginUser(user)"></i-button>
+                <i-button type="edit" label="Edit" ng-click="selectUser(user)"></i-button>
+                <i-button type="delete" ng-click="deleteUser(user)"></i-button>
               </div>
             </td>
           </tr>
         </table>
-        <i-button type="save" label="Save ALL" ng-click="saveAllData()"></i-button>
       </div>
     </fieldset>
 
     <script src="/x-js/bootstrap-5-support.js"></script>
     <script>
-      SOCIALBROWSER.customSetting.allowDevTools = false;
-      setInterval(() => {
-        SOCIALBROWSER.currentWindow.closeDevTools();
-      }, 1000 * 3);
+      // SOCIALBROWSER.customSetting.allowDevTools = false;
+      // setInterval(() => {
+      //   SOCIALBROWSER.currentWindow.closeDevTools();
+      // }, 1000 * 3);
 
       if (SOCIALBROWSER.customSetting.windowType !== 'popup') {
         SOCIALBROWSER.ipc('[open new popup]', {
           partition: 'persist:tools',
           url: document.location.href,
           iframe: true,
-          allowDevTools: false,
+          allowDevTools: true,
           alwaysOnTop: false,
           skipTaskbar: false,
           vip: true,
@@ -172,124 +203,6 @@
         window.location.href = SOCIALBROWSER.var.core.default_page;
       }
 
-      if ((randomUserAgentSupport = true)) {
-        SOCIALBROWSER.userAgentDeviceList = [
-          {
-            name: 'PC',
-            platformList: [
-              { name: 'Windows NT 6.1; WOW64', code: 'Win32' },
-              { name: 'Windows NT 10.0; Win64; x64', code: 'Win32' },
-              { name: 'Windows NT 11.0; Win64; x64', code: 'Win32' },
-              { name: 'Windows NT 10.0', code: 'Win32' },
-              { name: 'Windows NT 11.0', code: 'Win32' },
-              { name: 'MacIntel', code: 'MacIntel' },
-              { name: 'Macintosh; Intel Mac OS X 13_0', code: 'MacIntel' },
-              { name: 'Macintosh; Intel Mac OS X 14_0', code: 'MacIntel' },
-              { name: 'Macintosh; Intel Mac OS X 15_0', code: 'MacIntel' },
-              { name: 'Macintosh; Intel Mac OS X 16_0', code: 'MacIntel' },
-              { name: 'Linux x86_64', code: 'Linux x86_64' },
-              { name: 'X11; Ubuntu; Linux x86_64', code: 'Linux x86_64' },
-            ],
-          },
-          {
-            name: 'Mobile',
-            platformList: [
-              { name: 'Linux; Android 11', code: 'Android' },
-              { name: 'Linux; Android 12', code: 'Android' },
-              { name: 'Linux; Android 13', code: 'Android' },
-              { name: 'Linux; Android 14', code: 'Android' },
-              { name: 'Linux; Android 15', code: 'Android' },
-              { name: 'iPhone; CPU iPhone OS 13_0 like Mac OS X', code: 'iPhone' },
-              { name: 'iPhone; CPU iPhone OS 14_0  like Mac OS X', code: 'iPhone' },
-              { name: 'iPhone; CPU iPhone OS 15_0  like Mac OS X', code: 'iPhone' },
-              { name: 'iPhone; CPU iPhone OS 16_0  like Mac OS X', code: 'iPhone' },
-              { name: 'iPad; CPU OS 13_0  like Mac OS X', code: 'iPad' },
-              { name: 'iPad; CPU OS 14_0  like Mac OS X', code: 'iPad' },
-              { name: 'iPad; CPU OS 15_0  like Mac OS X', code: 'iPad' },
-              { name: 'iPad; CPU OS 16_0  like Mac OS X', code: 'iPad' },
-            ],
-          },
-        ];
-        SOCIALBROWSER.userAgentBrowserList = [
-          {
-            name: 'Chrome',
-            vendor: 'Google Inc.',
-            prefix: '',
-            randomMajor: () => SOCIALBROWSER.randomNumber(100, 132),
-            randomMinor: () => SOCIALBROWSER.randomNumber(0, 5735),
-            randomPatch: () => SOCIALBROWSER.randomNumber(0, 199),
-          },
-          {
-            name: 'Edge',
-            vendor: '',
-            prefix: '',
-            randomMajor: () => SOCIALBROWSER.randomNumber(100, 132),
-            randomMinor: () => SOCIALBROWSER.randomNumber(0, 5735),
-            randomPatch: () => SOCIALBROWSER.randomNumber(0, 199),
-          },
-          {
-            name: 'Firefox',
-            vendor: 'Mozilla',
-            prefix: '',
-            randomMajor: () => SOCIALBROWSER.randomNumber(90, 133),
-            randomMinor: () => SOCIALBROWSER.randomNumber(0, 9),
-            randomPatch: () => SOCIALBROWSER.randomNumber(0, 99),
-          },
-          {
-            name: 'Safari',
-            vendor: 'Apple Computer, Inc.',
-            prefix: '',
-            randomMajor: () => SOCIALBROWSER.randomNumber(600, 605),
-            randomMinor: () => SOCIALBROWSER.randomNumber(1, 15),
-            randomPatch: () => SOCIALBROWSER.randomNumber(10, 14),
-          },
-          {
-            name: 'Opera',
-            vendor: '',
-            prefix: '',
-            randomMajor: () => SOCIALBROWSER.randomNumber(100, 132),
-            randomMinor: () => SOCIALBROWSER.randomNumber(0, 5735),
-            randomPatch: () => SOCIALBROWSER.randomNumber(0, 199),
-          },
-        ];
-
-        SOCIALBROWSER.getRandomBrowser = function () {
-          let browser = { ...SOCIALBROWSER.userAgentBrowserList[SOCIALBROWSER.randomNumber(0, SOCIALBROWSER.userAgentBrowserList.length - 1)] };
-          browser.device = SOCIALBROWSER.userAgentDeviceList[SOCIALBROWSER.randomNumber(0, SOCIALBROWSER.userAgentDeviceList.length - 1)];
-          browser.platformInfo = browser.device.platformList[SOCIALBROWSER.randomNumber(0, browser.device.platformList.length - 1)];
-          browser.platform = browser.platformInfo.code;
-          if (browser.device.name === 'Mobile') {
-            browser.prefix = 'Mobile';
-          }
-
-          browser.major = browser.randomMajor();
-          browser.minor = browser.randomMinor();
-          browser.patch = browser.randomPatch();
-
-          browser.randomMajor = undefined;
-          browser.randomMinor = undefined;
-          browser.randomPatch = undefined;
-
-          if (browser.name.contains('Safari')) {
-            browser.url = `Mozilla/5.0 (${browser.platformInfo.name}) AppleWebKit/${browser.major}.${browser.minor} (KHTML, like Gecko) Version/${browser.patch}.0 Safari/${browser.major}.${browser.minor}`;
-          }
-          if (browser.name.contains('Firefox')) {
-            browser.url = `Mozilla/5.0 (${browser.platformInfo.name}; rv:${browser.major}.${browser.minor}) Gecko/20100101 Firefox/${browser.major}.${browser.minor}`;
-          } else {
-            browser.url = `Mozilla/5.0 (${browser.platformInfo.name}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${browser.major}.${browser.minor}.${browser.patch} ${browser.prefix} Safari/537.36`;
-          }
-
-          if (browser.name.contains('Edge')) {
-            browser.url += ` ${browser.name}/${browser.major}.${browser.minor}.${browser.patch}`;
-          }
-          return browser;
-        };
-
-        SOCIALBROWSER.getRandomUserAgent = function () {
-          return SOCIALBROWSER.getRandomBrowser().url;
-        };
-      }
-
       app.controller('mainController', ($scope, $http) => {
         $scope.expireDate = localStorage.getItem('expireDate');
 
@@ -297,11 +210,24 @@
           $scope.expireDate = new Date($scope.expireDate);
         }
         $scope.botName = localStorage.getItem('botName') || '';
+        $scope.checkExpireDate = function () {
+          $scope.activated = false;
+          if ($scope.expireDate && $scope.expireDate.getTime() > new Date().getTime()) {
+            $scope.activated = true;
+          }
+        };
+
+        $scope.checkExpireDate();
 
         $scope.siteLoginScript = site.from123('/*###site-login.js*/');
         $scope.TLSScript = site.from123('/*###TLS2.js*/');
         $scope.injectHTML = site.from123('/*###inject.html*/');
         $scope.message = 'TLS Contact Manager';
+        $scope.bookTypeList = [
+          { id: 1, name: 'Random Days' },
+          { id: 2, name: 'First Days' },
+          { id: 3, name: 'Latest Days' },
+        ];
         $scope.visaTypeList = [
           { id: 1, name: 'Grand Public PRIMO', display: 'Normal' },
           { id: 2, name: 'prime time', display: 'Prime Time' },
@@ -483,7 +409,7 @@
         $scope.runAll = function () {
           SOCIALBROWSER.share('[TLS]');
         };
-        $scope.user0 = { visaType: $scope.visaTypeList[0] };
+        $scope.user0 = { visaType: $scope.visaTypeList[0], bookType: $scope.bookTypeList[0] };
         $scope.userList = [];
         $scope.proxyList = SOCIALBROWSER.var.proxy_list || [];
         if ((list = localStorage.getItem('userList'))) {
@@ -492,10 +418,11 @@
         $scope.addUser = function (user) {
           user = user || $scope.user0;
           $scope.userList.push({ ...user });
-          $scope.user0 = { visaType: $scope.visaTypeList[0] };
+          $scope.user0 = { visaType: $scope.visaTypeList[0], bookType: $scope.bookTypeList[0] };
           localStorage.setItem('userList', JSON.stringify($scope.userList));
         };
         $scope.selectUser = function (user) {
+          user.$edit = !user.$edit;
           $scope.user0 = user;
         };
         $scope.deleteUser = function (user) {
@@ -521,14 +448,15 @@
 
           let html = $scope.injectHTML.replace('{{link}}', user.link).replace('{{centre}}', user.centre.name).replace('{{timeRequest}}', user.timeRequest).replace('{{timeRefresh}}', user.timeRefresh);
           let userData = `SOCIALBROWSER.addHTML = '${SOCIALBROWSER.to123(html)}';` + `SOCIALBROWSER.user0 = '${SOCIALBROWSER.to123(user)}';` + $scope.siteLoginScript + $scope.TLSScript;
+          let defaultUserAgent = SOCIALBROWSER.getRandomBrowser('pc', 'edge');
           SOCIALBROWSER.ipc('[open new popup]', {
             partition: 'ghost_' + new Date().getTime(),
             url: user.link,
             eval: userData,
             proxy: user.proxy,
-            userAgent: SOCIALBROWSER.getRandomUserAgent(),
+            defaultUserAgent: defaultUserAgent,
             iframe: true,
-            allowDevTools: false,
+            allowDevTools: true,
             alwaysOnTop: false,
             skipTaskbar: false,
             vip: true,
@@ -541,6 +469,7 @@
           localStorage.setItem('expireDate', $scope.expireDate);
           localStorage.setItem('botName', $scope.botName);
           localStorage.setItem('userList', JSON.stringify($scope.userList));
+          $scope.sendCoreDate();
         };
 
         $scope.onUploaded = function (data) {
@@ -564,7 +493,13 @@
         if (!document.location.host.like('*tls2*')) {
           serverURL = '86.48.5.65:8081';
         }
+
         site.serverURL = 'ws://' + serverURL + '/bots';
+        $scope.sendCoreDate = function () {
+          if ($scope.ws) {
+            $scope.ws.sendMessage({ type: 'info', xid: SOCIALBROWSER.var.core.id, activated: $scope.activated, expireDate: $scope.expireDate, botName: $scope.botName });
+          }
+        };
         $scope.wsInit = function () {
           site.ws(site.serverURL, (server) => {
             $scope.ws = server;
@@ -580,7 +515,8 @@
                 $scope.ws.uuid = message.uuid;
                 $scope.ws.sendMessage({ type: 'info', xid: SOCIALBROWSER.var.core.id, activated: $scope.activated, expireDate: $scope.expireDate, botName: $scope.botName });
               } else if (message.type === 'online') {
-                alert('Bot is Online Connected');
+                $scope.online = true;
+                $scope.$apply();
               } else if (message.type === 'selectDates') {
                 if (message.xid !== SOCIALBROWSER.var.core.id) {
                   SOCIALBROWSER.share({ type: '[click-appontment]', user: message.user });
