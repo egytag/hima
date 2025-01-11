@@ -230,6 +230,14 @@
           <label for="parallelConnections">request :</label>
           <input type="number" id="parallelConnections" name="parallelConnections" value="1" required />
         </div>
+        <div class="col">
+          <label for="VISATYPESELECT">Visa Type :</label>
+          <select id="VISATYPESELECT" onchange="SOCIALBROWSER.changeVisaType()">
+            <option value="Grand Public PRIMO">Normal</option>
+            <option value="prime time'">Prime Time</option>
+            <option value="prime time weekend">prime Time Weekend</option>
+          </select>
+        </div>
       </div>
     </form>
     <div id="textTLSContainer">

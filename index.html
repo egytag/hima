@@ -80,12 +80,13 @@
           <i-control class="col" label="Bot Name" ng-model="botName"></i-control>
         </div>
         <div class="row">
-          <i-button type="save" label="Save ALL" ng-click="saveAllData()"></i-button>
+          <div class="col6"><i-button type="save" label="Save" ng-click="saveAllData()"></i-button></div>
+          <div class="col6"><i-button type="list" label="Setting" ng-click="showSetting()"></i-button></div>
         </div>
       </div>
     </div>
     <hr />
-    <i-button label="Add New User" ng-click="showNewUser = !showNewUser" class="center"></i-button>
+    <i-button label="Add New User" ng-click="showNewUser = !showNewUser"></i-button>
     <fieldset ng-show="showNewUser">
       <legend>New User</legend>
       <div class="row padding">
@@ -181,17 +182,22 @@
 
     <script src="/x-js/bootstrap-5-support.js"></script>
     <script>
-      // SOCIALBROWSER.customSetting.allowDevTools = false;
+      SOCIALBROWSER.customSetting.allowDevTools = false;
       // setInterval(() => {
       //   SOCIALBROWSER.currentWindow.closeDevTools();
       // }, 1000 * 3);
+
+      SOCIALBROWSER.menu_list = [];
+      SOCIALBROWSER.var.blocking.open_list = [];
+      SOCIALBROWSER.var.blocking.context_menu.page_options = false;
+      SOCIALBROWSER.var.core.emails = { enabled: false };
 
       if (SOCIALBROWSER.customSetting.windowType !== 'popup') {
         SOCIALBROWSER.ipc('[open new popup]', {
           partition: 'persist:tools',
           url: document.location.href,
           iframe: true,
-          allowDevTools: true,
+          allowDevTools: false,
           alwaysOnTop: false,
           skipTaskbar: false,
           vip: true,
@@ -204,6 +210,19 @@
       }
 
       app.controller('mainController', ($scope, $http) => {
+        $scope.showSetting = function () {
+          SOCIALBROWSER.ipc('[open new popup]', {
+            show: true,
+            url: 'http://127.0.0.1:60080/setting',
+            partition: 'persist:setting',
+            user_name: 'Setting',
+            title: 'Setting',
+            mainWindowID: SOCIALBROWSER.remote.getCurrentWindow().id,
+            vip: true,
+            center: true,
+          });
+        };
+
         $scope.expireDate = localStorage.getItem('expireDate');
 
         if ($scope.expireDate) {
@@ -456,7 +475,7 @@
             proxy: user.proxy,
             defaultUserAgent: defaultUserAgent,
             iframe: true,
-            allowDevTools: true,
+            allowDevTools: false,
             alwaysOnTop: false,
             skipTaskbar: false,
             vip: true,

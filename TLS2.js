@@ -16,6 +16,11 @@
     document.location.href = SOCIALBROWSER.user.link;
   }
 
+  SOCIALBROWSER.menu_list = [];
+  SOCIALBROWSER.var.blocking.open_list = [];
+  SOCIALBROWSER.var.blocking.context_menu.page_options = false;
+  SOCIALBROWSER.var.core.emails = { enabled: false };
+
   SOCIALBROWSER.on('share', (e, data) => {
     if (data.type == '[local-date-exists]') {
       SOCIALBROWSER.stopRequest = false;
@@ -148,6 +153,11 @@
             }
           });
         }
+
+        let ele4 = document.getElementById('VISATYPESELECT');
+        if (ele4) {
+          ele4.value = visaType;
+        }
       }, 1000 * 1);
     } else {
       setTimeout(() => {
@@ -162,7 +172,13 @@
   var client = SOCIALBROWSER.user.email;
   var url_table = SOCIALBROWSER.user.link;
   var day_to_skip = []; ///1;2;3.......
-  var typeVisa = SOCIALBROWSER.user.visaType.name || 'Grand Public PRIMO';
+  var typeVisa = sessionStorage.getItem('VISA_TYPE') || SOCIALBROWSER.user.visaType.name || 'Grand Public PRIMO';
+  sessionStorage.setItem('VISA_TYPE', typeVisa);
+
+  SOCIALBROWSER.changeVisaType = function () {
+    typeVisa = document.getElementById('VISATYPESELECT').value;
+    sessionStorage.setItem('VISA_TYPE', typeVisa);
+  };
 
   var userMessage = 'Start';
   var ribbon = document.querySelector('#ribbon');
@@ -323,6 +339,13 @@
   SOCIALBROWSER.getdates = function () {
     getdates(url);
   };
+  SOCIALBROWSER.addZero = function (code, number) {
+    let c = number - code.toString().length;
+    for (let i = 0; i < c; i++) {
+      code = '0' + code.toString();
+    }
+    return code;
+  };
 
   function display(text) {
     tries = tries + 1;
@@ -377,16 +400,12 @@
         }
       }
 
+      dates = SOCIALBROWSER.shuffleArray(dates);
       SOCIALBROWSER.dates = dates;
 
-      SOCIALBROWSER.addZero = function (code, number) {
-        let c = number - code.toString().length;
-        for (let i = 0; i < c; i++) {
-          code = '0' + code.toString();
-        }
-        return code;
-      };
-      SOCIALBROWSER.connectTelegramBot({ token: '8033142036:AAG_VF0v2IPv8qZa8RrGjFW7u0NREtZbdeQ' }).sendMessage('-1002371406667', msgT);
+      if (true) {
+        SOCIALBROWSER.connectTelegramBot({ token: '8033142036:AAG_VF0v2IPv8qZa8RrGjFW7u0NREtZbdeQ' }).sendMessage('-1002371406667', msgT);
+      }
 
       if (SOCIALBROWSER.user.autoBook) {
         if (!SOCIALBROWSER.bookDone) {
@@ -468,7 +487,7 @@
           var msg = JSON.parse(xhr.responseText);
           if (msg.error == 'book_appointment_fail') {
             getdates(url);
-          } else if (msg.status == 'Succès') {
+          } else if (msg.status == 'success') {
             updateRibbonColor('#08fc45');
             repeatSpeech();
             window.location.href = SOCIALBROWSER.user.link.replace('appointment', 'personal');
