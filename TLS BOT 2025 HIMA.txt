@@ -1,0 +1,293 @@
+// ==UserScript==
+// @name         hima tls v1
+// @namespace    http://tampermonkey.net/
+// @version      2024-01-06
+// @description  try to take over the world!
+// @author       Scabbo
+// @match        *fr.tlscontact.com/*
+// @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////  VVVVVVVVVV  //////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+var email = "soghes@funkoo.xyzSate@81@";
+var MotDePasse = "Sate@81@";
+var client = "-----";
+var url_table ="https://fr.tlscontact.com/appointment/ma/maCAS2fr/19094200";
+var TimeRequest = 250; ///en seconde
+var day_to_skip =[];///1;2;3.......
+var typeVisa = 'normal';
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////  Variables and functions /////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+var Texte_Mdf ="Start";
+var ribbon = document.createElement('div');
+function updateRibbonText() {ribbon.textContent = "Client: " + client + " >>>>>>>>>> " + Texte_Mdf;}
+function updateRibbonColor(color) {ribbon.style.backgroundColor = color;}
+var x = TimeRequest*1000;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////  speakHello()  //////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function speakHello() {
+    const message = new SpeechSynthesisUtterance('TESTE TERMINER TESTE TERMINER TESTE TERMINER' + client);
+    message.rate = 0.7;
+    window.speechSynthesis.speak(message);
+}
+function repeatSpeech() {
+    speakHello();
+    setInterval(speakHello, 10000);
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////  ribbon START  //////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+(function () {
+    'use strict';
+
+    function createRibbon() {
+
+        ribbon.style.backgroundColor = '#000099';
+        ribbon.style.color = 'white';
+        ribbon.style.textAlign = 'center';
+        ribbon.style.padding = '10px';
+        ribbon.style.position = 'fixed';
+        ribbon.style.top = '0';
+        ribbon.style.width = '100%';
+        ribbon.style.zIndex = '9999';
+        ribbon.style.width = '100%'; // Définir la largeur à 100%
+        ribbon.style.height = '10px'; // Définir la hauteur à 50 pixels
+        ribbon.style.cursor = 'pointer';
+        ribbon.style.boxShadow = '0 3px 36px -25px rgba(0,0,0,.75)';
+        ribbon.style.display = 'flex';
+        ribbon.style.alignItems = 'center'; // Centrer verticalement
+        ribbon.style.justifyContent = 'center'; // Centrer horizontalement
+        ribbon.style.fontWeight = 'bold';
+        /////////////////////////////////////////////////
+        document.body.appendChild(ribbon);
+        /////////////////////////////////////////////////
+       ribbon.addEventListener('click', function() {getdates(url)});
+        /////////////////////////////////////////////////
+    }
+    createRibbon();
+    updateRibbonText();
+})();
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+var k ;
+var url ;
+var sp = url_table.split("/");
+var country = sp[4];
+var region = sp[5];
+var id = sp[6];
+var captcha ;
+var c_token;
+
+ var hours_to_skip = 2; // swaya3 testkhatahoum
+
+ url = "https://fr.tlscontact.com/services/customerservice/api/tls/appointment/"+country+"/"+region+"/table?client=fr&"+"formGroupId="+id+"&appointmentType="+typeVisa+"&appointmentStage=appointment";
+
+     //getdates(url);
+     var tries = 0 ;
+
+ var W = x ; //seconds f normal
+var values ;
+var dates = [];
+var cookiz = document.cookie.split(';');
+for(var z = 0 ; z<cookiz.length ; z++)
+{
+    if(cookiz[z].includes("XSRF"))
+    {
+        c_token = cookiz[z].split('=')[1];
+        break;
+
+        console.log(c_token)
+    }
+}
+
+
+
+
+function getdates(theUrl) {
+    tries = tries + 1 ;
+    Texte_Mdf = tries;
+    updateRibbonText();
+    updateRibbonColor('#000099');
+var xhr = new XMLHttpRequest();
+xhr.open("GET", theUrl, true);
+xhr.onreadystatechange = function() {
+  if (xhr.readyState === 4) {
+  var st = xhr.status;
+
+    if(st==200) {
+        display("OK");
+
+         k = xhr.responseText;
+    c(xhr.responseText);
+    }
+    else if(st==403 || st ==401) {
+var loginurl = 'https://fr.tlscontact.com/oauth2/authorization/oidc';display("Déconnecté");
+    setTimeout(function(){getdates(url)},x);
+    }
+     else if(st==429) {
+    display("Vore compte est bloqué");
+    setTimeout(function(){getdates(url)},x);
+    }
+     else if(st==404) {
+    display("Vore compte est bloqué)");
+    setTimeout(function(){getdates(url)},x);
+    }
+    else {
+    display("Erreur erreur erreur!");
+    setTimeout(function(){getdates(url)},x);
+    }
+  }
+};
+xhr.send();
+
+}
+
+function display(text) {
+    tries = tries + 1 ;
+    Texte_Mdf= tries+" "+text;
+    updateRibbonText();
+}
+
+function c(t) {dates.length = 0;
+values = JSON.parse(t);
+var count = Object.keys(values).length;
+for(var i = 0 ; i <count ; i ++) {
+var key = Object.keys(values)[i];
+var row = values[key];
+var row_count = Object.keys(row).length;
+
+for(var j = 0; j<row_count ; j++) {
+
+    var row_key = Object.keys(row)[j];
+    var availabality = Object.values(row)[j];
+    if(availabality>0 && !day_to_skip.includes(key) ) dates[dates.length] = key+" " +row_key;
+    //console.log(key+" " +row_key+" "+availabality);
+}
+
+
+} //end loops
+    if(dates.length>0) {
+
+
+    var choose = Math.floor(Math.random() * dates.length);
+    getCaptcha(dates[choose]);
+    notify("félicitation félicitation !!!! Un RDV est réservé: "+dates[choose]);
+    updateRibbonColor('#CC0000');
+
+
+}
+else {
+        setTimeout(function(){getdates(url);},W);
+
+}
+
+
+
+}
+
+
+function getCaptcha(take) {
+    console.log('happend');
+    grecaptcha.ready(function() {
+grecaptcha.execute('6LcTpXcfAAAAAM3VojNhyV-F1z92ADJIvcSZ39Y9', {action: 'book'}).then(function(token) {
+              console.log(token); captcha = token;
+              catchit(take);
+          });
+
+
+
+
+});
+
+} //end captcha
+
+function catchit(take) {
+  var c_url = "https://fr.tlscontact.com/services/customerservice/api/tls/appointment/book?client=fr&issuer="+region+"&formGroupId="+id+"&timeslot="+take+"&appointmentType="+typeVisa+'&accountType=INDI&lang=fr-fr';
+
+var xhr = new XMLHttpRequest();
+xhr.open("POST", c_url, true);
+xhr.setRequestHeader("Content-Type", "application/json");
+
+xhr.setRequestHeader("recaptcha-token", captcha);
+xhr.setRequestHeader("X-XSRF-TOKEN", c_token);
+xhr.onreadystatechange = function() {
+  if (xhr.readyState === 4) {
+    if (xhr.status === 200) {
+
+
+      // Success
+      var msg = JSON.parse(xhr.responseText);
+      if(msg.error == "book_appointment_fail") {getdates(url);}
+    else if(msg.status == "success"){updateRibbonColor('#330033'); repeatSpeech();}
+    else {console.log("Erreur erreur erreur!"); getdates(url);updateRibbonColor('#000099');}
+    } else {
+      // Error
+if (xhr.status === 400) {notify('Erreur erreur erreur!');updateRibbonColor('#000099');}
+    console.log(xhr.responseText);
+    }
+  }
+};
+
+xhr.send();
+}
+
+
+function getType() {
+
+
+var response;
+
+Texte_Mdf = "Préparation..";
+updateRibbonText();
+    var u = "https://visas-fr.tlscontact.com/services/customerservice/api/tls/appointment/appointment_type/fr/"+id;
+
+var visatypeindex;
+var xhr = new XMLHttpRequest();
+xhr.open('GET', u, true);
+xhr.onreadystatechange = function() {
+  if (xhr.readyState === XMLHttpRequest.DONE) {
+    if (xhr.status === 200) {
+      // Request succeeded
+       response = JSON.parse(xhr.responseText);
+        typeVisa = response.appointment_type; if(visatypeindex ==1) {typeVisa = "prime time";}
+ else if(visatypeindex ==2) {typeVisa = "prime time weekend";}
+        notify("Type de visa détécté");
+        url = "https://fr.tlscontact.com/services/customerservice/api/tls/appointment/"+country+"/"+region+"/table?client=fr&issuer="+region+"&formGroupId="+id+"&appointmentType="+typeVisa+"&appointmentStage=appointment";
+
+
+
+     setTimeout(function(){getdates(url)},x);
+    } else {
+      alert("Erreur 3awed seyi");
+    }
+  }
+};
+xhr.send();
+
+}
+
+
+
+
+function notify(txt) {
+
+
+    Texte_Mdf = txt;
+    updateRibbonText();
+
+
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////// END ////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+})();

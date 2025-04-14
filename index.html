@@ -1,582 +1,594 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="myApp">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TLS Contact Manager</title>
-    <link rel="stylesheet" href="/x-css/bootstrap-5-support.css" />
-    <style>
-      :root {
-        --bs-body-bg: #04364e;
-        --body-background: #04364e;
-        --fieldset-background: #009688;
-        --legend-color: #ffffff;
-        --label-color: #ffeb3b;
-      }
-      i-upload form {
-        display: contents;
-      }
-      .top-header {
-        background: #4caf50;
-        padding: 10px !important;
-        border-radius: 10px;
-      }
-      i-date .fas,
-      i-datetime .fas {
-        color: #ffc107;
-      }
-      i-datetime p {
-        background: #fff;
-      }
-      .btn-light {
-        --bs-btn-color: #ffffff;
-        --bs-btn-bg: #0d6efd;
-        --bs-btn-border-color: #0d6efd;
-        --bs-btn-hover-color: #ffffff;
-        --bs-btn-hover-bg: #279f27;
-        --bs-btn-hover-border-color: #22684f;
-        --bs-btn-focus-shadow-rgb: 211, 212, 213;
-        --bs-btn-active-color: #ffffff;
-        --bs-btn-active-bg: #32b153;
-        --bs-btn-active-border-color: #babbbc;
-        --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-        --bs-btn-disabled-color: #000;
-        --bs-btn-disabled-bg: #f8f9fa;
-        --bs-btn-disabled-border-color: #f8f9fa;
-      }
-    </style>
-  </head>
-  <body class="container loaded" ng-controller="mainController">
-    <div class="row top-header">
-      <div class="col4">
-        <table class="table">
-          <tr>
-            <td><p class="center">Online</p></td>
-            <td>
-              <p ng-show="online" class="center bold green">Yes</p>
-              <p ng-hide="online" class="center bold red">No</p>
-            </td>
-          </tr>
-          <tr>
-            <td><p class="center">Activated</p></td>
-            <td>
-              <p ng-show="activated" class="center bold green">Yes</p>
-              <p ng-hide="activated" class="center bold red">No</p>
-            </td>
-          </tr>
-          <tr>
-            <td><p class="center">Expire Date</p></td>
-            <td>
-              <p class="bold red center">{{expireDate | xdatetime}}</p>
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="col5">
-        <h1 class="bold white center">{{message}}</h1>
-      </div>
-      <div class="col3">
-        <div class="row">
-          <i-control class="col" label="Bot Name" ng-model="botName"></i-control>
-        </div>
-        <div class="row">
-          <div class="col6"><i-button type="save" label="Save" ng-click="saveAllData()"></i-button></div>
-          <div class="col6"><i-button type="list" label="Setting" ng-click="showSetting()"></i-button></div>
-        </div>
-      </div>
-    </div>
-    <hr />
-    <i-button label="Add New User" ng-click="showNewUser = !showNewUser"></i-button>
-    <fieldset ng-show="showNewUser">
-      <legend>New User</legend>
-      <div class="row padding">
-        <div class="row">
-          <i-list ng-search="user0.$centre" primary="code" items="centerList" class="col3" label="Centre" ng-model="user0.centre"></i-list>
-          <i-control class="col3" label="Client Name" ng-model="user0.name"></i-control>
-          <i-control class="col3" label="Email" ng-model="user0.email"></i-control>
-          <i-control class="col3" label="Password" ng-model="user0.password"></i-control>
-        </div>
-        <div class="row">
-          <i-control class="col3" type="number" label="Time Request" ng-model="user0.timeRequest"></i-control>
-          <i-control class="col3" type="number" label="Time Refresh" ng-model="user0.timeRefresh"></i-control>
-          <i-control class="col3" type="number" label="re-Login Time" ng-model="user0.timeLogin"></i-control>
-          <i-list ng-search="user0.$visaType" display="display" items="visaTypeList" class="col3" label="Visa Type" ng-model="user0.visaType"></i-list>
-
-          <div class="row">
-            <i-checkbox class="col3" label="Auto Appointment" ng-model="user0.autoAppointment"></i-checkbox>
-            <i-checkbox class="col3" label="Auto Book" ng-model="user0.autoBook"></i-checkbox>
-            <i-datetime class="col" label="Select Book Time" ng-model="user0.bookTime"></i-datetime>
-          </div>
-        </div>
-        <div class="row">
-          <i-list primary="id" items="bookTypeList" class="col3" label="Book Type" ng-model="user0.bookType"></i-list>
-          <i-control class="col9" label="Link" ng-model="user0.link"></i-control>
-        </div>
-
-        <i-button type="push" label="Add To User List" ng-click="addUser(user0)"></i-button>
-      </div>
-    </fieldset>
-    <hr />
-    <fieldset>
-      <legend>User List</legend>
-      <div class="row">
-        <div class="col6">
-          <i-control ng-model="$search" label="Smart Search"></i-control>
-        </div>
-        <div class="col6">
-          <div class="row">
-            <i-upload class="col" api="/extentions/tls/import-user-list" on-uploaded="onUploaded($data)" ng-model="importModel" label="Import User List"> </i-upload>
-            <i-button class="col" type="export" ng-click="export()" ng-model="exportModel" label="Export User List"> </i-button>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <table class="table">
-          <tr>
-            <th>Client Data</th>
-            <th>Email / Password</th>
-            <th ng-show="user0.$edit == true">Times</th>
-            <th>Actions</th>
-          </tr>
-          <tr ng-repeat="user in userList | filter:$search track by $index ">
-            <td>
-              <div class="row">
-                <i-list label="Centre" ng-search="user.$centre" primary="code" items="centerList" ng-model="user.centre"></i-list>
-                <i-control label="Client Name" ng-model="user.name"></i-control>
-                <i-control ng-show="user.$edit == true" label="Link" ng-model="user.link"></i-control>
-                <i-list ng-show="user.$edit == true" ng-search="user.$visaType" display="display" items="visaTypeList" class="col3" label="Visa Type" ng-model="user.visaType"></i-list>
-              </div>
-            </td>
-            <td>
-              <div class="row">
-                <i-control label="Email" ng-model="user.email"></i-control>
-                <i-control ng-show="user.$edit == true" label="Password" type="password" ng-model="user.password"></i-control>
-                <i-list ng-search="user.$proxy" class="col" label="Proxy" items="proxyList" display="ip" display2="password" ng-model="user.proxy"></i-list>
-              </div>
-              <div class="row" ng-show="user.$edit == true">
-                <i-checkbox label="Auto Appointment" ng-model="user.autoAppointment"></i-checkbox>
-                <i-checkbox label="Auto Book" ng-model="user.autoBook"></i-checkbox>
-                <i-datetime label="Select Book Time" ng-model="user.bookTime"></i-datetime>
-              </div>
-            </td>
-            <td ng-show="user.$edit == true">
-              <div class="row">
-                <i-control type="number" label="Time Request" ng-model="user.timeRequest"></i-control>
-                <i-control type="number" label="Time Refresh" ng-model="user.timeRefresh"></i-control>
-                <i-control type="number" label="re-Login Time" ng-model="user.timeLogin"></i-control>
-                <i-list primary="id" items="bookTypeList" class="col" label="Book Type" ng-model="user.bookType"></i-list>
-              </div>
-            </td>
-            <td>
-              <div class="row">
-                <i-button type="login" label="Login" ng-click="loginUser(user)"></i-button>
-                <i-button type="edit" label="Edit" ng-click="selectUser(user)"></i-button>
-                <i-button type="delete" ng-click="deleteUser(user)"></i-button>
-              </div>
-            </td>
-          </tr>
-        </table>
-      </div>
-    </fieldset>
-
-    <script src="/x-js/bootstrap-5-support.js"></script>
-    <script>
-      SOCIALBROWSER.customSetting.allowDevTools = false;
-      // setInterval(() => {
-      //   SOCIALBROWSER.currentWindow.closeDevTools();
-      // }, 1000 * 3);
-
-      SOCIALBROWSER.menu_list = [];
-      SOCIALBROWSER.var.blocking.open_list = [];
-      SOCIALBROWSER.var.blocking.context_menu.page_options = false;
-      SOCIALBROWSER.var.core.emails = { enabled: false };
-
-      if (SOCIALBROWSER.customSetting.windowType !== 'popup') {
-        SOCIALBROWSER.ipc('[open new popup]', {
-          partition: 'persist:tools',
-          url: document.location.href,
-          iframe: true,
-          allowDevTools: false,
-          alwaysOnTop: false,
-          skipTaskbar: false,
-          vip: true,
-          show: true,
-          center: true,
-          maximize: true,
-        });
-
-        window.location.href = SOCIALBROWSER.var.core.default_page;
-      }
-
-      app.controller('mainController', ($scope, $http) => {
-        $scope.showSetting = function () {
-          SOCIALBROWSER.ipc('[open new popup]', {
-            show: true,
-            url: 'http://127.0.0.1:60080/setting',
-            partition: 'persist:setting',
-            user_name: 'Setting',
-            title: 'Setting',
-            mainWindowID: SOCIALBROWSER.remote.getCurrentWindow().id,
-            vip: true,
-            center: true,
-          });
-        };
-
-        $scope.expireDate = localStorage.getItem('expireDate');
-
-        if ($scope.expireDate) {
-          $scope.expireDate = new Date($scope.expireDate);
-        }
-        $scope.botName = localStorage.getItem('botName') || '';
-        $scope.checkExpireDate = function () {
-          $scope.activated = false;
-          if ($scope.expireDate && $scope.expireDate.getTime() > new Date().getTime()) {
-            $scope.activated = true;
-          }
-        };
-
-        $scope.checkExpireDate();
-
-        $scope.siteLoginScript = site.from123('/*###site-login.js*/');
-        $scope.TLSScript = site.from123('/*###TLS2.js*/');
-        $scope.injectHTML = site.from123('/*###inject.html*/');
-        $scope.message = 'TLS Contact Manager';
-        $scope.bookTypeList = [
-          { id: 1, name: 'Random Days' },
-          { id: 2, name: 'First Days' },
-          { id: 3, name: 'Latest Days' },
-        ];
-        $scope.visaTypeList = [
-          { id: 1, name: 'Grand Public PRIMO', display: 'Normal' },
-          { id: 2, name: 'prime time', display: 'Prime Time' },
-          { id: 3, name: 'prime time weekend', display: 'prime Time Weekend' },
-        ];
-        $scope.centerList = [
-          {
-            name: 'Casablanca',
-            code: 'maCAS2fr',
-            country: 'fr',
-            aptType: 'Grand%20Public%20PRIMO',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Casablanca Cas2',
-            code: '1maCAS2fr',
-            country: 'fr',
-            aptType: 'Grand%20Public%20VISE',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Casablanca Cas3',
-            code: '2maCAS2fr',
-            country: 'fr',
-            aptType: 'Grand%20Public%20CIRCULATION',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Agadir',
-            code: 'maAGA2fr',
-            country: 'fr',
-            aptType: 'Grand%20Public%20PRIMO',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Agadir Cas2',
-            code: '1maAGA2fr',
-            country: 'fr',
-            aptType: 'Grand%20Public%20VISE',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Agadir Cas3',
-            code: '2maAGA2fr',
-            country: 'fr',
-            aptType: 'Grand%20Public%20CIRCULATION',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Marrakech',
-            code: 'maRAK2fr',
-            country: 'fr',
-            aptType: 'Grand%20Public%20PRIMO',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Marrakech Cas2',
-            code: '1maRAK2fr',
-            country: 'fr',
-            aptType: 'Grand%20Public%20VISE',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Marrakech Cas3',
-            code: '2maRAK2fr',
-            country: 'fr',
-            aptType: 'Grand%20Public%20CIRCULATION',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-
-          {
-            name: 'Fes',
-            code: 'maFEZ2fr',
-            country: 'fr',
-            aptType: 'Primo',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Fes Cas2',
-            code: '1maFEZ2fr',
-            country: 'fr',
-            aptType: 'Renouvellement',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Fes Cas3',
-            code: '2maFEZ2fr',
-            country: 'fr',
-            aptType: 'Circulation',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Oujda',
-            code: 'maOUD2fr',
-            country: 'fr',
-            aptType: 'Primo',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Oujda Cas2',
-            code: '1maOUD2fr',
-            country: 'fr',
-            aptType: 'Renouvellement',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Oujda Cas3',
-            code: '2maOUD2fr',
-            country: 'fr',
-            aptType: 'Circulation',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-
-          {
-            name: 'Tanger',
-            code: 'maTNG2fr',
-            country: 'fr',
-            aptType: 'PRIMO',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Tanger Cas2',
-            code: '1maTNG2fr',
-            country: 'fr',
-            aptType: 'Renouvellement',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Tanger Cas3',
-            code: '2maTNG2fr',
-            country: 'fr',
-            aptType: 'Circulation',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Rabat',
-            code: 'maRBA2fr',
-            country: 'fr',
-            aptType: 'Primo',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Rabat Cas2',
-            code: '1maRBA2fr',
-            country: 'fr',
-            aptType: 'Renouvellement',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-          {
-            name: 'Rabat Cas3',
-            code: '2maRBA2fr',
-            country: 'fr',
-            aptType: 'Circulation',
-            issueCountry: 'ma',
-            prefix: '',
-          },
-        ];
-
-        $scope.runAll = function () {
-          SOCIALBROWSER.share('[TLS]');
-        };
-        $scope.user0 = { visaType: $scope.visaTypeList[0], bookType: $scope.bookTypeList[0] };
-        $scope.userList = [];
-        $scope.proxyList = SOCIALBROWSER.var.proxy_list || [];
-        if ((list = localStorage.getItem('userList'))) {
-          $scope.userList = JSON.parse(list);
-        }
-        $scope.addUser = function (user) {
-          user = user || $scope.user0;
-          $scope.userList.push({ ...user });
-          $scope.user0 = { visaType: $scope.visaTypeList[0], bookType: $scope.bookTypeList[0] };
-          localStorage.setItem('userList', JSON.stringify($scope.userList));
-        };
-        $scope.selectUser = function (user) {
-          user.$edit = !user.$edit;
-          $scope.user0 = user;
-        };
-        $scope.deleteUser = function (user) {
-          $scope.userList = $scope.userList.filter((u) => u.email !== user.email);
-          localStorage.setItem('userList', JSON.stringify($scope.userList));
-        };
-        $scope.checkExpireDate = function () {
-          $scope.activated = false;
-          if ($scope.expireDate && $scope.expireDate.getTime() > new Date().getTime()) {
-            $scope.activated = true;
-          }
-        };
-        $scope.loginUser = function (user) {
-          $scope.checkExpireDate();
-
-          if (!$scope.activated) {
-            alert('Bot Expire Date');
-            return false;
-          }
-
-          user.expireDate = $scope.expireDate;
-          user.activated = $scope.activated;
-
-          let html = $scope.injectHTML.replace('{{link}}', user.link).replace('{{centre}}', user.centre.name).replace('{{timeRequest}}', user.timeRequest).replace('{{timeRefresh}}', user.timeRefresh);
-          let userData = `SOCIALBROWSER.addHTML = '${SOCIALBROWSER.to123(html)}';` + `SOCIALBROWSER.user0 = '${SOCIALBROWSER.to123(user)}';` + $scope.siteLoginScript + $scope.TLSScript;
-          let defaultUserAgent = SOCIALBROWSER.getRandomBrowser('pc', 'edge');
-          SOCIALBROWSER.ipc('[open new popup]', {
-            partition: 'ghost_' + new Date().getTime(),
-            url: user.link,
-            eval: userData,
-            proxy: user.proxy,
-            defaultUserAgent: defaultUserAgent,
-            iframe: true,
-            allowDevTools: false,
-            alwaysOnTop: false,
-            skipTaskbar: false,
-            vip: true,
-            show: true,
-            center: true,
-          });
-        };
-
-        $scope.saveAllData = function () {
-          localStorage.setItem('expireDate', $scope.expireDate);
-          localStorage.setItem('botName', $scope.botName);
-          localStorage.setItem('userList', JSON.stringify($scope.userList));
-          $scope.sendCoreDate();
-        };
-
-        $scope.onUploaded = function (data) {
-          $scope.userList = data.list;
-        };
-        $scope.export = function () {
-          $http({
-            method: 'POST',
-            url: '/extentions/tls/set-user-list',
-            data: {
-              list: $scope.userList,
-            },
-          }).then(function (response) {
-            if (response.data.done) {
-              document.location.href = '/extentions/tls/export-user-list';
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>DZ GROBLER</title>
+        <link rel="stylesheet" href="/x-css/bootstrap-5-support.css" />
+        <style>
+            :root {
+                --bs-body-bg: #04364e;
+                --body-background: #04364e;
+                --fieldset-background: #009688;
+                --legend-color: #ffffff;
+                --label-color: #ffeb3b;
+                --table-color: #198754;
+                --bs-body-color: #ffc107;
             }
-          });
-        };
+            i-upload form {
+                display: contents;
+            }
+            .top-header {
+                background: #4caf50;
+                padding: 10px !important;
+                border-radius: 10px;
+            }
+            i-date .fas,
+            i-datetime .fas {
+                color: #ffc107;
+            }
+            i-datetime p {
+                background: #fff;
+            }
+            .btn-light {
+                --bs-btn-color: #ffffff;
+                --bs-btn-bg: #0d6efd;
+                --bs-btn-border-color: #0d6efd;
+                --bs-btn-hover-color: #ffffff;
+                --bs-btn-hover-bg: #279f27;
+                --bs-btn-hover-border-color: #22684f;
+                --bs-btn-focus-shadow-rgb: 211, 212, 213;
+                --bs-btn-active-color: #ffffff;
+                --bs-btn-active-bg: #32b153;
+                --bs-btn-active-border-color: #babbbc;
+                --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+                --bs-btn-disabled-color: #000;
+                --bs-btn-disabled-bg: #f8f9fa;
+                --bs-btn-disabled-border-color: #f8f9fa;
+            }
+            img {
+                width: 128px;
+                height: 128px;
+            }
+        </style>
+    </head>
+    <body class="container loaded" ng-controller="mainController">
+        <div class="row top-header">
+            <div class="col4">
+                <table class="table">
+                    <tr>
+                        <td><p class="center">Online</p></td>
+                        <td>
+                            <p ng-show="online" class="center bold green">Yes</p>
+                            <p ng-hide="online" class="center bold red">No</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><p class="center">Activated</p></td>
+                        <td>
+                            <p ng-show="activated" class="center bold green">Yes</p>
+                            <p ng-hide="activated" class="center bold red">No</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><p class="center">Expire Date</p></td>
+                        <td>
+                            <p class="bold red center">{{expireDate | xdatetime}}</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col5 center">
+                <h1 class="bold white center">{{message}}</h1>
+                <img src="/extentions/images/tls.png" alt="" />
+            </div>
+            <div class="col3">
+                <div class="row">
+                    <i-control class="col" label="Bot Name" ng-model="botName"></i-control>
+                </div>
+                <div class="row">
+                    <div class="col6"><i-button type="save" label="Save" ng-click="saveAllData()"></i-button></div>
+                    <div class="col6"><i-button type="list" label="Setting" ng-click="showSetting()"></i-button></div>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <i-button label="Add New User" ng-click="showNewUser = !showNewUser"></i-button>
+        <fieldset ng-show="showNewUser">
+            <legend>New User</legend>
+            <div class="row padding">
+                <div class="row">
+                    <i-list ng-search="user0.$centre" primary="code" items="centerList" class="col3" label="Centre" ng-model="user0.centre"></i-list>
+                    <i-control class="col3" label="Client Name" ng-model="user0.name"></i-control>
+                    <i-control class="col3" label="Email" ng-model="user0.email"></i-control>
+                    <i-control class="col3" label="Password" ng-model="user0.password"></i-control>
+                </div>
+                <div class="row">
+                    <i-control class="col3" type="number" label="Time Request" ng-model="user0.timeRequest"></i-control>
+                    <i-control class="col3" type="number" label="Time Refresh" ng-model="user0.timeRefresh"></i-control>
+                    <i-control class="col3" type="number" label="re-Login Time" ng-model="user0.timeLogin"></i-control>
+                    <i-list ng-search="user0.$visaType" display="display" items="visaTypeList" class="col3" label="Visa Type" ng-model="user0.visaType"></i-list>
 
-        let serverURL = document.location.host;
-        if (!document.location.host.like('*tls2*')) {
-          serverURL = '86.48.5.65:8081';
-        }
+                    <div class="row">
+                        <i-checkbox class="col3" label="Auto Appointment" ng-model="user0.autoAppointment"></i-checkbox>
+                        <i-checkbox class="col3" label="Auto Book" ng-model="user0.autoBook"></i-checkbox>
+                        <i-datetime class="col" label="Select Book Time" ng-model="user0.bookTime"></i-datetime>
+                    </div>
+                </div>
+                <div class="row">
+                    <i-list primary="id" items="bookTypeList" class="col3" label="Book Type" ng-model="user0.bookType"></i-list>
+                    <i-control class="col9" label="Link" ng-model="user0.link"></i-control>
+                </div>
 
-        site.serverURL = 'ws://' + serverURL + '/bots';
-        $scope.sendCoreDate = function () {
-          if ($scope.ws) {
-            $scope.ws.sendMessage({ type: 'info', xid: SOCIALBROWSER.var.core.id, activated: $scope.activated, expireDate: $scope.expireDate, botName: $scope.botName });
-          }
-        };
-        $scope.wsInit = function () {
-          site.ws(site.serverURL, (server) => {
-            $scope.ws = server;
-            $scope.ws.onOpen = () => {};
-            $scope.ws.onClose = () => {
-              setTimeout(() => {
-                $scope.wsInit();
-              }, 1000 * 5);
-            };
-            $scope.ws.onMessage = (message) => {
-              if (message.type === 'ready') {
-                $scope.ws.ip = message.ip;
-                $scope.ws.uuid = message.uuid;
-                $scope.ws.sendMessage({ type: 'info', xid: SOCIALBROWSER.var.core.id, activated: $scope.activated, expireDate: $scope.expireDate, botName: $scope.botName });
-              } else if (message.type === 'online') {
-                $scope.online = true;
-                $scope.$apply();
-              } else if (message.type === 'selectDates') {
-                if (message.xid !== SOCIALBROWSER.var.core.id) {
-                  SOCIALBROWSER.share({ type: '[click-appontment]', user: message.user });
-                }
-              } else if (message.type === 'activated') {
-                $scope.activated = message.activated;
+                <i-button type="push" label="Add To User List" ng-click="addUser(user0)"></i-button>
+            </div>
+        </fieldset>
+        <hr />
+        <fieldset>
+            <legend>User List</legend>
+            <div class="row">
+                <div class="col6">
+                    <i-control ng-model="$search" label="Smart Search"></i-control>
+                </div>
+                <div class="col6">
+                    <div class="row">
+                        <i-upload class="col" api="/extentions/tls/import-user-list" on-uploaded="onUploaded($data)" ng-model="importModel" label="Import User List"> </i-upload>
+                        <i-button class="col" type="export" ng-click="export()" ng-model="exportModel" label="Export User List"> </i-button>
+                    </div>
+                </div>
+            </div>
 
-                let date = new Date();
+            <div class="row">
+                <table class="table">
+                    <tr>
+                        <th>Client Data</th>
+                        <th>Email / Password</th>
+                        <th ng-show="user0.$edit == true">Times</th>
+                        <th>Actions</th>
+                    </tr>
+                    <tr ng-repeat="user in userList | filter:$search track by $index ">
+                        <td>
+                            <div class="row">
+                                <i-list label="Centre" ng-search="user.$centre" primary="code" items="centerList" ng-model="user.centre"></i-list>
+                                <i-control label="Client Name" ng-model="user.name"></i-control>
+                                <i-control ng-show="user.$edit == true" label="Link" ng-model="user.link"></i-control>
+                                <i-list ng-show="user.$edit == true" ng-search="user.$visaType" display="display" items="visaTypeList" class="col3" label="Visa Type" ng-model="user.visaType"></i-list>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="row">
+                                <i-control label="Email" ng-model="user.email"></i-control>
+                                <i-control ng-show="user.$edit == true" label="Password" type="password" ng-model="user.password"></i-control>
+                                <i-list ng-search="user.$proxy" class="col" label="Proxy" items="proxyList" display="ip" display2="password" ng-model="user.proxy"></i-list>
+                            </div>
+                            <div class="row" ng-show="user.$edit == true">
+                                <i-checkbox label="Auto Appointment" ng-model="user.autoAppointment"></i-checkbox>
+                                <i-checkbox label="Auto Book" ng-model="user.autoBook"></i-checkbox>
+                                <i-datetime label="Select Book Time" ng-model="user.bookTime"></i-datetime>
+                            </div>
+                        </td>
+                        <td ng-show="user.$edit == true">
+                            <div class="row">
+                                <i-control type="number" label="Time Request" ng-model="user.timeRequest"></i-control>
+                                <i-control type="number" label="Time Refresh" ng-model="user.timeRefresh"></i-control>
+                                <i-control type="number" label="re-Login Time" ng-model="user.timeLogin"></i-control>
+                                <i-list primary="id" items="bookTypeList" class="col" label="Book Type" ng-model="user.bookType"></i-list>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="row">
+                                <i-button type="login" label="Login" ng-click="loginUser(user)"></i-button>
+                                <i-button type="edit" label="Edit" ng-click="selectUser(user)"></i-button>
+                                <i-button type="delete" ng-click="deleteUser(user)"></i-button>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </fieldset>
 
-                if (message.key == 'now') {
-                  $scope.expireDate = null;
-                } else if (message.key == 'day') {
-                  date.setDate(date.getDate() + 1);
-                  $scope.expireDate = date;
-                } else if (message.key == 'month') {
-                  date.setMonth(date.getMonth() + 1);
-                  $scope.expireDate = date;
-                } else {
-                  $scope.expireDate = null;
-                }
+        <script src="/x-js/bootstrap-5-support.js"></script>
+        <script>
+            SOCIALBROWSER.customSetting.allowDevTools = true;
+
+            // SOCIALBROWSER.menu_list = [];
+            // SOCIALBROWSER.var.blocking.open_list = [];
+            // SOCIALBROWSER.var.blocking.context_menu.page_options = false;
+            // SOCIALBROWSER.var.core.emails = { enabled: false };
+
+            if (SOCIALBROWSER.customSetting.windowType !== 'popup') {
+                SOCIALBROWSER.ipc('[open new popup]', {
+                    partition: 'persist:tools',
+                    url: document.location.href,
+                    iframe: true,
+                    allowDevTools: SOCIALBROWSER.customSetting.allowDevTools,
+                    alwaysOnTop: false,
+                    skipTaskbar: false,
+                    vip: true,
+                    show: true,
+                    center: true,
+                    maximize: true,
+                });
+
+                window.location.href = SOCIALBROWSER.var.core.default_page;
+            }
+
+            app.controller('mainController', ($scope, $http) => {
+                $scope.showSetting = function () {
+                    SOCIALBROWSER.ipc('[open new popup]', {
+                        show: true,
+                        url: 'http://127.0.0.1:60080/setting',
+                        partition: 'persist:setting',
+                        user_name: 'Setting',
+                        title: 'Setting',
+                        mainWindowID: SOCIALBROWSER.remote.getCurrentWindow().id,
+                        vip: true,
+                        center: true,
+                    });
+                };
+
+                $scope.expireDate = localStorage.getItem('expireDate');
 
                 if ($scope.expireDate) {
-                  localStorage.setItem('expireDate', $scope.expireDate);
-                } else {
-                  localStorage.removeItem('expireDate');
+                    $scope.expireDate = new Date() || new Date($scope.expireDate);
                 }
+                $scope.botName = localStorage.getItem('botName') || '';
+                $scope.checkExpireDate = function () {
+                    $scope.activated = true;
+                    if ($scope.expireDate && $scope.expireDate.getTime() > new Date().getTime()) {
+                        $scope.activated = true;
+                    }
+                };
 
-                $scope.ws.sendMessage({ type: 'activated', activated: $scope.activated, expireDate: $scope.expireDate });
-                $scope.$apply();
-              }
-            };
-          });
-        };
+                $scope.checkExpireDate();
 
-        $scope.wsInit();
-        SOCIALBROWSER.on('share', (e, data) => {
-          if (data.type == '[date-exists]') {
-            $scope.ws.sendMessage({ type: 'selectDates', user: data.user, xid: SOCIALBROWSER.var.core.id });
-          }
-        });
-      });
-    </script>
-  </body>
+                $scope.siteLoginScript = site.from123('/*###site-login.js*/');
+                $scope.TLSScript = site.from123('/*###TLS2.js*/');
+                $scope.injectHTML = site.from123('/*###inject.html*/');
+                $scope.message = 'DZ GROBLER';
+                $scope.bookTypeList = [
+                    { id: 1, name: 'Random Days' },
+                    { id: 2, name: 'First Days' },
+                    { id: 3, name: 'Latest Days' },
+                ];
+                $scope.visaTypeList = [
+                    { id: 1, name: 'normal', display: 'Normal' },
+                    { id: 2, name: 'prime time', display: 'Prime Time' },
+                    { id: 3, name: 'prime time weekend', display: 'prime Time Weekend' },
+                ];
+                $scope.centerList = [
+                    {
+                        name: 'Casablanca',
+                        code: 'maCAS2fr',
+                        country: 'fr',
+                        aptType: 'Grand%20Public%20PRIMO',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Casablanca Cas2',
+                        code: '1maCAS2fr',
+                        country: 'fr',
+                        aptType: 'Grand%20Public%20VISE',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Casablanca Cas3',
+                        code: '2maCAS2fr',
+                        country: 'fr',
+                        aptType: 'Grand%20Public%20CIRCULATION',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Agadir',
+                        code: 'maAGA2fr',
+                        country: 'fr',
+                        aptType: 'Grand%20Public%20PRIMO',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Agadir Cas2',
+                        code: '1maAGA2fr',
+                        country: 'fr',
+                        aptType: 'Grand%20Public%20VISE',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Agadir Cas3',
+                        code: '2maAGA2fr',
+                        country: 'fr',
+                        aptType: 'Grand%20Public%20CIRCULATION',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Marrakech',
+                        code: 'maRAK2fr',
+                        country: 'fr',
+                        aptType: 'Grand%20Public%20PRIMO',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Marrakech Cas2',
+                        code: '1maRAK2fr',
+                        country: 'fr',
+                        aptType: 'Grand%20Public%20VISE',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Marrakech Cas3',
+                        code: '2maRAK2fr',
+                        country: 'fr',
+                        aptType: 'Grand%20Public%20CIRCULATION',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+
+                    {
+                        name: 'Fes',
+                        code: 'maFEZ2fr',
+                        country: 'fr',
+                        aptType: 'Primo',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Fes Cas2',
+                        code: '1maFEZ2fr',
+                        country: 'fr',
+                        aptType: 'Renouvellement',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Fes Cas3',
+                        code: '2maFEZ2fr',
+                        country: 'fr',
+                        aptType: 'Circulation',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Oujda',
+                        code: 'maOUD2fr',
+                        country: 'fr',
+                        aptType: 'Primo',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Oujda Cas2',
+                        code: '1maOUD2fr',
+                        country: 'fr',
+                        aptType: 'Renouvellement',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Oujda Cas3',
+                        code: '2maOUD2fr',
+                        country: 'fr',
+                        aptType: 'Circulation',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+
+                    {
+                        name: 'Tanger',
+                        code: 'maTNG2fr',
+                        country: 'fr',
+                        aptType: 'PRIMO',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Tanger Cas2',
+                        code: '1maTNG2fr',
+                        country: 'fr',
+                        aptType: 'Renouvellement',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Tanger Cas3',
+                        code: '2maTNG2fr',
+                        country: 'fr',
+                        aptType: 'Circulation',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Rabat',
+                        code: 'maRBA2fr',
+                        country: 'fr',
+                        aptType: 'Primo',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Rabat Cas2',
+                        code: '1maRBA2fr',
+                        country: 'fr',
+                        aptType: 'Renouvellement',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                    {
+                        name: 'Rabat Cas3',
+                        code: '2maRBA2fr',
+                        country: 'fr',
+                        aptType: 'Circulation',
+                        issueCountry: 'ma',
+                        prefix: '',
+                    },
+                ];
+
+                $scope.runAll = function () {
+                    SOCIALBROWSER.share('[TLS]');
+                };
+                $scope.user0 = { visaType: $scope.visaTypeList[0], bookType: $scope.bookTypeList[0] };
+                $scope.userList = [];
+                $scope.proxyList = SOCIALBROWSER.var.proxy_list || [];
+                if ((list = localStorage.getItem('userList'))) {
+                    $scope.userList = JSON.parse(list);
+                }
+                $scope.addUser = function (user) {
+                    user = user || $scope.user0;
+                    $scope.userList.push({ ...user });
+                    $scope.user0 = { visaType: $scope.visaTypeList[0], bookType: $scope.bookTypeList[0] };
+                    localStorage.setItem('userList', JSON.stringify($scope.userList));
+                };
+                $scope.selectUser = function (user) {
+                    user.$edit = !user.$edit;
+                    $scope.user0 = user;
+                };
+                $scope.deleteUser = function (user) {
+                    $scope.userList = $scope.userList.filter((u) => u.email !== user.email);
+                    localStorage.setItem('userList', JSON.stringify($scope.userList));
+                };
+
+                $scope.loginUser = function (user) {
+                    $scope.checkExpireDate();
+
+                    if (!$scope.activated) {
+                        alert('Bot Expire Date');
+                        return false;
+                    }
+
+                    user.expireDate = $scope.expireDate;
+                    user.activated = $scope.activated;
+
+                    let html = $scope.injectHTML
+                        .replace('{{link}}', user.link)
+                        .replace('{{centre}}', user.centre.name)
+                        .replace('{{timeRequest}}', user.timeRequest)
+                        .replace('{{timeRefresh}}', user.timeRefresh);
+                    let userData =
+                        `module.exports = function (SOCIALBROWSER) { SOCIALBROWSER.addHTML = '${SOCIALBROWSER.to123(html)}';` +
+                        `SOCIALBROWSER.user0 = '${SOCIALBROWSER.to123(user)}';` +
+                        $scope.siteLoginScript +
+                        $scope.TLSScript +
+                        ' } ';
+                    let defaultUserAgent = SOCIALBROWSER.getRandomBrowser('pc', 'edge');
+
+                    SOCIALBROWSER.ipc('[open new popup]', {
+                        partition: 'ghost_' + SOCIALBROWSER.md5(user.email),
+                        url: user.link,
+                        eval: userData,
+                        proxy: user.proxy,
+                        show: true,
+                        defaultUserAgent: defaultUserAgent,
+                        iframe: true,
+                        cloudFlare: true,
+                        allowDevTools: SOCIALBROWSER.customSetting.allowDevTools,
+                        allowAds: true,
+                        allowPopup: true,
+                        showDevTools: false,
+                        alwaysOnTop: false,
+                        skipTaskbar: false,
+                        vip: true,
+                        center: true,
+                    });
+                };
+
+                $scope.saveAllData = function () {
+                    localStorage.setItem('expireDate', $scope.expireDate);
+                    localStorage.setItem('botName', $scope.botName);
+                    localStorage.setItem('userList', JSON.stringify($scope.userList));
+                    $scope.sendCoreDate();
+                };
+
+                $scope.onUploaded = function (data) {
+                    $scope.userList = data.list;
+                };
+                $scope.export = function () {
+                    $http({
+                        method: 'POST',
+                        url: '/extentions/tls/set-user-list',
+                        data: {
+                            list: $scope.userList,
+                        },
+                    }).then(function (response) {
+                        if (response.data.done) {
+                            document.location.href = '/extentions/tls/export-user-list';
+                        }
+                    });
+                };
+
+                let serverURL = document.location.host;
+
+                serverURL = '45.84.138.100:8081';
+
+                site.serverURL = 'ws://' + serverURL + '/bots';
+                $scope.sendCoreDate = function () {
+                    if ($scope.ws) {
+                        $scope.ws.sendMessage({ type: 'info', xid: SOCIALBROWSER.var.core.id, activated: $scope.activated, expireDate: $scope.expireDate, botName: $scope.botName });
+                    }
+                };
+                $scope.wsInit = function () {
+                    site.ws(site.serverURL, (server) => {
+                        $scope.ws = server;
+                        $scope.ws.onOpen = () => {};
+                        $scope.ws.onClose = () => {
+                            setTimeout(() => {
+                                $scope.wsInit();
+                            }, 1000 * 5);
+                        };
+                        $scope.ws.onMessage = (message) => {
+                            if (message.type === 'ready') {
+                                $scope.ws.ip = message.ip;
+                                $scope.ws.uuid = message.uuid;
+                                $scope.ws.sendMessage({ type: 'info', xid: SOCIALBROWSER.var.core.id, activated: $scope.activated, expireDate: $scope.expireDate, botName: $scope.botName });
+                            } else if (message.type === 'online') {
+                                $scope.online = true;
+                                $scope.$apply();
+                            } else if (message.type === 'selectDates') {
+                                if (message.xid !== SOCIALBROWSER.var.core.id) {
+                                    SOCIALBROWSER.share({ type: '[click-appontment]', user: message.user });
+                                }
+                            } else if (message.type === 'activated') {
+                                $scope.activated = message.activated;
+
+                                let date = new Date();
+
+                                if (message.key == 'now') {
+                                    $scope.expireDate = null;
+                                } else if (message.key == 'day') {
+                                    date.setDate(date.getDate() + 1);
+                                    $scope.expireDate = date;
+                                } else if (message.key == 'month') {
+                                    date.setMonth(date.getMonth() + 1);
+                                    $scope.expireDate = date;
+                                } else {
+                                    $scope.expireDate = null;
+                                }
+
+                                if ($scope.expireDate) {
+                                    localStorage.setItem('expireDate', $scope.expireDate);
+                                } else {
+                                    localStorage.removeItem('expireDate');
+                                }
+
+                                $scope.ws.sendMessage({ type: 'activated', activated: $scope.activated, expireDate: $scope.expireDate });
+                                $scope.$apply();
+                            }
+                        };
+                    });
+                };
+
+                $scope.wsInit();
+                SOCIALBROWSER.on('share', (e, data) => {
+                    if (data.type == '[date-exists]') {
+                        $scope.ws.sendMessage({ type: 'selectDates', user: data.user, xid: SOCIALBROWSER.var.core.id });
+                    }
+                });
+            });
+        </script>
+    </body>
 </html>

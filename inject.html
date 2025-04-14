@@ -1,248 +1,248 @@
 <div>
-  <style>
-    .tls-simple-text-banner {
-      height: auto;
-    }
-    #HIMA {
-      width: 75%;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-      background: #0a308f;
-    }
-    .centre {
-      display: block;
-      text-align: center;
-      color: #ffffff;
-    }
+    <style>
+        .tls-simple-text-banner {
+            height: auto;
+        }
+        #HIMA {
+            width: 75%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            background: #0a308f;
+        }
+        .centre {
+            display: block;
+            text-align: center;
+            color: #ffffff;
+        }
 
-    #ribbon {
-      color: #fff;
-      font-weight: bold;
-    }
+        #ribbon {
+            color: #fff;
+            font-weight: bold;
+        }
 
-    button {
-      background-color: #eb6000;
-      color: #fff;
-      padding: 8px 12px;
-      font-size: 16px;
-      border: none;
-      border-radius: 25px;
-      cursor: pointer;
-    }
+        button {
+            background-color: #eb6000;
+            color: #fff;
+            padding: 8px 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+        }
 
-    button:hover {
-      background-color: #4a9ced;
-    }
+        button:hover {
+            background-color: #4a9ced;
+        }
 
-    .none {
-      display: none;
-    }
-    .center {
-      margin: 0 auto;
-      text-align: center;
-    }
+        .none {
+            display: none;
+        }
+        .center {
+            margin: 0 auto;
+            text-align: center;
+        }
 
-    #messageZone {
-      text-align: center;
-      font-weight: normal;
-      font-size: 22px;
-      color: #f4f7f9;
-      display: inline-flex;
-    }
+        #messageZone {
+            text-align: center;
+            font-weight: normal;
+            font-size: 22px;
+            color: #f4f7f9;
+            display: inline-flex;
+        }
 
-    #statusT {
-      text-align: center;
-      font-weight: normal;
-      font-size: 22px;
-      color: #f4f7f9;
-      display: inline-flex;
-    }
-    form {
-      margin: 20px;
-    }
-    label {
-      font-size: 20px;
-      color: #fbf8f8;
-    }
-    input {
-      margin: 0 auto;
-      width: 80px;
-      height: 20px;
-      font-size: 18px;
-      font-weight: bold;
-      text-align: center;
-      border-radius: 5px;
-      border: navajowhite;
-    }
-    #textTLSContainer {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
+        #statusT {
+            text-align: center;
+            font-weight: normal;
+            font-size: 22px;
+            color: #f4f7f9;
+            display: inline-flex;
+        }
+        form {
+            margin: 20px;
+        }
+        label {
+            font-size: 20px;
+            color: #fbf8f8;
+        }
+        input {
+            margin: 0 auto;
+            width: 80px;
+            height: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+            border: navajowhite;
+        }
+        #textTLSContainer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
 
-    #textTLSTitle {
-      color: #ffffff;
-      margin-top: 8px;
-      font-size: 34px;
-      text-align: center;
-      font-weight: normal;
-    }
+        #textTLSTitle {
+            color: #ffffff;
+            margin-top: 8px;
+            font-size: 34px;
+            text-align: center;
+            font-weight: normal;
+        }
 
-    #linkTLS {
-      text-decoration: none;
-      transition: color 0.3s ease;
-      font-size: 13px;
-      text-align: center;
-    }
+        #linkTLS {
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-size: 13px;
+            text-align: center;
+        }
 
-    #linkTLS:hover {
-      color: #0056b3;
-      text-decoration: underline;
-      font-size: 13px;
-      text-align: center;
-    }
+        #linkTLS:hover {
+            color: #0056b3;
+            text-decoration: underline;
+            font-size: 13px;
+            text-align: center;
+        }
 
-    select {
-      padding: 10px;
-      font-size: 16px;
-      border: none;
-      background-color: #fff;
-      border-radius: 5px;
-      margin: 5px;
-    }
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            background-color: #fff;
+            border-radius: 5px;
+            margin: 5px;
+        }
 
-    #ttTLSDiv {
-      text-align: center;
-    }
-    .row {
-      display: flex;
-      width: 100% !important;
-      padding: 0px !important;
-      margin: 0px !important;
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-content: flex-start;
-      align-items: flex-start;
-      justify-content: space-between;
-    }
+        #ttTLSDiv {
+            text-align: center;
+        }
+        .row {
+            display: flex;
+            width: 100% !important;
+            padding: 0px !important;
+            margin: 0px !important;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
 
-    .row::after {
-      content: '' !important;
-      clear: both !important;
-      display: table !important;
-    }
+        .row::after {
+            content: '' !important;
+            clear: both !important;
+            display: table !important;
+        }
 
-    .col1,
-    .col2,
-    .col3,
-    .col4,
-    .col5,
-    .col6,
-    .col7,
-    .col8,
-    .col9,
-    .col10,
-    .col11,
-    .col12 {
-      vertical-align: top;
-      padding: 0;
-      margin: 0;
-      float: left;
-      display: flex;
-      justify-content: flex-start;
-      align-items: stretch;
-      flex-direction: column;
-      align-content: stretch;
-      flex-wrap: nowrap;
-    }
+        .col1,
+        .col2,
+        .col3,
+        .col4,
+        .col5,
+        .col6,
+        .col7,
+        .col8,
+        .col9,
+        .col10,
+        .col11,
+        .col12 {
+            vertical-align: top;
+            padding: 0;
+            margin: 0;
+            float: left;
+            display: flex;
+            justify-content: flex-start;
+            align-items: stretch;
+            flex-direction: column;
+            align-content: stretch;
+            flex-wrap: nowrap;
+        }
 
-    .col1 {
-      width: calc(1 / 12 * 100%) !important;
-    }
+        .col1 {
+            width: calc(1 / 12 * 100%) !important;
+        }
 
-    .col2 {
-      width: calc(2 / 12 * 100%) !important;
-    }
+        .col2 {
+            width: calc(2 / 12 * 100%) !important;
+        }
 
-    .col3 {
-      width: calc(3 / 12 * 100%) !important;
-    }
+        .col3 {
+            width: calc(3 / 12 * 100%) !important;
+        }
 
-    .col4 {
-      width: calc(4 / 12 * 100%) !important;
-    }
+        .col4 {
+            width: calc(4 / 12 * 100%) !important;
+        }
 
-    .col5 {
-      width: calc(5 / 12 * 100%) !important;
-    }
+        .col5 {
+            width: calc(5 / 12 * 100%) !important;
+        }
 
-    .col6 {
-      width: calc(6 / 12 * 100%) !important;
-    }
+        .col6 {
+            width: calc(6 / 12 * 100%) !important;
+        }
 
-    .col7 {
-      width: calc(7 / 12 * 100%) !important;
-    }
+        .col7 {
+            width: calc(7 / 12 * 100%) !important;
+        }
 
-    .col8 {
-      width: calc(8 / 12 * 100%) !important;
-    }
+        .col8 {
+            width: calc(8 / 12 * 100%) !important;
+        }
 
-    .col9 {
-      width: calc(9 / 12 * 100%) !important;
-    }
+        .col9 {
+            width: calc(9 / 12 * 100%) !important;
+        }
 
-    .col10 {
-      width: calc(10 / 12 * 100%) !important;
-    }
+        .col10 {
+            width: calc(10 / 12 * 100%) !important;
+        }
 
-    .col11 {
-      width: calc(11 / 12 * 100%) !important;
-    }
+        .col11 {
+            width: calc(11 / 12 * 100%) !important;
+        }
 
-    .col12 {
-      width: calc(12 / 12 * 100%) !important;
-    }
-  </style>
-  <h1 class="centre">Centre : {{centre}}</h1>
-  <div class="center">
-    <button id="allButtons" onclick="SOCIALBROWSER.share('[TLS]');">Start All</button>
-    <button id="selectTLSButton" onclick="SOCIALBROWSER.stopRequest = false;SOCIALBROWSER.getdates();">Start Rdv</button>
-    <button id="stopTLSButton" onclick="SOCIALBROWSER.stopRequest = true;">Stop</button>
-    <button id="unlockTLSButton" onclick="SOCIALBROWSER.unlock();">Debloquer</button>
-    <button id="refreshTLSButton" onclick="document.location.reload()">Refresher</button>
-  </div>
-  <div id="ttTLSDiv">
-    <form id="ttTLSForm" class="none"></form>
-    <form>
-      <div class="row">
-        <div class="col">
-          <label for="refreshTLSTime">Search s:</label>
-          <input type="number" id="refreshTLSTime" name="refreshTLSTime" value="{{timeRequest}}" required />
-        </div>
-        <div class="col">
-          <label for="refreshPageInput">Refresher s :</label>
-          <input type="number" id="refreshPageInput" name="refreshPageInput" value="{{timeRefresh}}" required />
-        </div>
-        <div class="col">
-          <label for="parallelConnections">request :</label>
-          <input type="number" id="parallelConnections" name="parallelConnections" value="1" required />
-        </div>
-        <div class="col">
-          <label for="VISATYPESELECT">Visa Type :</label>
-          <select id="VISATYPESELECT" onchange="SOCIALBROWSER.changeVisaType()">
-            <option value="Grand Public PRIMO">Normal</option>
-            <option value="prime time'">Prime Time</option>
-            <option value="prime time weekend">prime Time Weekend</option>
-          </select>
-        </div>
-      </div>
-    </form>
-    <div id="textTLSContainer">
-      <div id="ribbon">---</div>
+        .col12 {
+            width: calc(12 / 12 * 100%) !important;
+        }
+    </style>
+    <h1 class="centre">Centre : {{centre}}</h1>
+    <div class="center">
+        <button id="allButtons" onclick="window.share('[TLS]');">Start All</button>
+        <button id="selectTLSButton" onclick="window.stopRequest(false);window.getdates();">Start Rdv</button>
+        <button id="stopTLSButton" onclick="window.stopRequest(true);">Stop</button>
+        <button id="unlockTLSButton" onclick="window.unlock();">Debloquer</button>
+        <button id="refreshTLSButton" onclick="document.location.reload()">Refresher</button>
     </div>
-  </div>
-  <br />
+    <div id="ttTLSDiv">
+        <form id="ttTLSForm" class="none"></form>
+        <form>
+            <div class="row">
+                <div class="col">
+                    <label for="refreshTLSTime">Search s:</label>
+                    <input type="number" id="refreshTLSTime" name="refreshTLSTime" value="{{timeRequest}}" required />
+                </div>
+                <div class="col">
+                    <label for="refreshPageInput">Refresher s :</label>
+                    <input type="number" id="refreshPageInput" name="refreshPageInput" value="{{timeRefresh}}" required />
+                </div>
+                <div class="col">
+                    <label for="parallelConnections">request :</label>
+                    <input type="number" id="parallelConnections" name="parallelConnections" value="1" required />
+                </div>
+                <div class="col">
+                    <label for="VISATYPESELECT">Visa Type :</label>
+                    <select id="VISATYPESELECT" onchange="window.changeVisaType()">
+                        <option value="Grand Public PRIMO">Normal</option>
+                        <option value="prime time'">Prime Time</option>
+                        <option value="prime time weekend">prime Time Weekend</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+        <div id="textTLSContainer">
+            <div id="ribbon">---</div>
+        </div>
+    </div>
+    <br />
 </div>
