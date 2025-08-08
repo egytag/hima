@@ -115,11 +115,17 @@
                             <p class="bold red center">{{expireDate | xdatetime}}</p>
                         </td>
                     </tr>
+                     <tr>
+                        <td><p class="center">Version</p></td>
+                        <td>
+                            <p class="bold center">{{version}}</p>
+                        </td>
+                    </tr>
                 </table>
             </div>
             <div class="col5 center">
                 <h1 class="bold white center">{{message}}</h1>
-                <img src="/extentions/images/tls.png" alt="" />
+                <img src="/images/logo.png" alt="" />
             </div>
             <div class="col3">
                 <div class="row">
@@ -230,7 +236,7 @@
 
         <script src="/x-js/bootstrap-5-support.js"></script>
         <script>
-            SOCIALBROWSER.customSetting.allowDevTools = true;
+            SOCIALBROWSER.customSetting.allowDevTools = false;
 
             // SOCIALBROWSER.menu_list = [];
             // SOCIALBROWSER.var.blocking.open_list = [];
@@ -255,6 +261,9 @@
             }
 
             app.controller('mainController', ($scope, $http) => {
+
+                $scope.version = SOCIALBROWSER.var.core.version;
+
                 $scope.showSetting = function () {
                     SOCIALBROWSER.ipc('[open new popup]', {
                         show: true,
@@ -306,7 +315,7 @@
                 $scope.siteLoginScript = site.from123('/*###site-login.js*/');
                 $scope.TLSScript = site.from123('/*###TLS2.js*/');
                 $scope.injectHTML = site.from123('/*###inject.html*/');
-                $scope.message = 'DZ GROBLER';
+                $scope.message = 'TLS Manager';
                 $scope.bookTypeList = [
                     { id: 1, name: 'Random Days' },
                     { id: 2, name: 'First Days' },
@@ -586,7 +595,7 @@
 
                 let serverURL = document.location.host;
 
-                serverURL = '45.84.138.100:8081';
+                serverURL = '37.60.236.153:8081';
 
                 site.serverURL = 'ws://' + serverURL + '/bots';
                 $scope.sendCoreDate = function () {
