@@ -33,12 +33,7 @@ if (!SOCIALBROWSER.isIframe()) {
             }
         } else if (data == '[TLS]') {
             SOCIALBROWSER.stopRequest = false;
-            let btn = document.querySelector('#selectTLSButton');
-            if (btn) {
-                SOCIALBROWSER.click(btn);
-            } else {
-                SOCIALBROWSER.getdates();
-            }
+            SOCIALBROWSER.getdates();
         } else if (data.type == '[goto-bottom]' && data.partition == SOCIALBROWSER.partition) {
             window.scrollTo({
                 top: document.body.scrollHeight,
@@ -59,19 +54,25 @@ if (!SOCIALBROWSER.isIframe()) {
     };
 
     SOCIALBROWSER.unlock = function () {
+        let defaultUserAgent = SOCIALBROWSER.getRandomBrowser('pc', 'chrome');
         SOCIALBROWSER.ipc('[open new popup]', {
-            partition: 'ghost_' + new Date().getTime(),
+            partition: 'ghost_' + new Date().getTime() + '_' + SOCIALBROWSER.randomNumber(),
+            show: true,
+            defaultUserAgent: defaultUserAgent,
             url: SOCIALBROWSER.user.link,
             eval: SOCIALBROWSER.customSetting.eval,
             proxy: SOCIALBROWSER.user.proxy,
             iframe: true,
+            cloudFlare: true,
+            allowAds: true,
+            allowPopup: true,
+            showDevTools: false,
             alwaysOnTop: false,
             skipTaskbar: false,
             vip: true,
-            show: true,
             center: true,
         });
-        SOCIALBROWSER.currentWindow.close();
+        SOCIALBROWSER.window.close();
     };
 
     SOCIALBROWSER.keepLogin = function () {
@@ -402,6 +403,10 @@ if (!SOCIALBROWSER.isIframe()) {
                         dates = dates.slice(0, parseInt(dates.length / 2));
                     }
                 } else if (SOCIALBROWSER.user.bookType.id == 3) {
+                    if (dates.length > 2) {
+                        dates = dates.slice(parseInt(dates.length / 3), parseInt((dates.length / 3) * 2));
+                    }
+                } else if (SOCIALBROWSER.user.bookType.id == 4) {
                     if (dates.length > 1) {
                         dates = dates.slice(parseInt(dates.length / 2));
                     }
@@ -409,18 +414,18 @@ if (!SOCIALBROWSER.isIframe()) {
             }
 
             dates = SOCIALBROWSER.shuffleArray(dates);
-            SOCIALBROWSER.dates = dates;
 
+            SOCIALBROWSER.dates = dates;
+            SOCIALBROWSER.selectedDate = null;
             if (true) {
                 SOCIALBROWSER.connectTelegramBot({ token: '8033142036:AAG_VF0v2IPv8qZa8RrGjFW7u0NREtZbdeQ' }).sendMessage('-1002371406667', msgT);
             }
 
             if (SOCIALBROWSER.user.autoBook) {
                 if (!SOCIALBROWSER.bookDone) {
-                    let d = null;
-                    if (SOCIALBROWSER.user.bookTime) {
-                        let date0 = new Date(SOCIALBROWSER.user.bookTime);
-                        d =
+                    if (SOCIALBROWSER.user.bookDate) {
+                        let date0 = new Date(SOCIALBROWSER.user.bookDate);
+                        SOCIALBROWSER.selectedDate =
                             date0.getFullYear() +
                             '-' +
                             (date0.getMonth() + 1) +
@@ -430,20 +435,36 @@ if (!SOCIALBROWSER.isIframe()) {
                             SOCIALBROWSER.addZero(date0.getHours(), 2) +
                             ':' +
                             SOCIALBROWSER.addZero(date0.getMinutes(), 2);
-                        SOCIALBROWSER.user.bookTime = null;
+                        SOCIALBROWSER.user.bookDate = null;
+                    } else if (SOCIALBROWSER.user.bookTimeList) {
+                        SOCIALBROWSER.dates = [];
+                        SOCIALBROWSER.user.bookTimeList
+                            .filter((bt) => bt.$selected == true)
+                            .forEach((bt) => {
+                                dates
+                                    .filter((dd) => dd.contains(bt.time))
+                                    .forEach((ddd) => {
+                                        SOCIALBROWSER.dates.push(ddd);
+                                    });
+                            });
+                        if (SOCIALBROWSER.dates.length == 0) {
+                            SOCIALBROWSER.dates = dates;
+                        }
                     }
-                    d = d || dates.pop();
-                    getCaptcha(d);
-                    notify('Date Trouvée: ' + d);
-                    updateRibbonColor('#fc6f03');
+                    if (SOCIALBROWSER.dates.length > 0) {
+                        SOCIALBROWSER.selectedDate = SOCIALBROWSER.selectedDate || SOCIALBROWSER.dates.pop();
+                        getCaptcha(SOCIALBROWSER.selectedDate);
+                        notify('Date Trouvée: ' + SOCIALBROWSER.selectedDate);
+                        updateRibbonColor('#fc6f03');
+                    }
                 } else {
                     clearInterval(SOCIALBROWSER.bookInterval);
                 }
                 SOCIALBROWSER.bookInterval = setInterval(() => {
-                    if (!SOCIALBROWSER.bookDone) {
-                        let d = dates.pop();
-                        getCaptcha(d);
-                        notify('Date found: ' + d);
+                    if (!SOCIALBROWSER.bookDone && SOCIALBROWSER.dates.length > 0) {
+                        SOCIALBROWSER.selectedDate = SOCIALBROWSER.dates.pop();
+                        getCaptcha(SOCIALBROWSER.selectedDate);
+                        notify('Date found: ' + SOCIALBROWSER.selectedDate);
                         updateRibbonColor('#fc6f03');
                     } else {
                         clearInterval(SOCIALBROWSER.bookInterval);

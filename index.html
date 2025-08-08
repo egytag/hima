@@ -12,8 +12,16 @@
                 --fieldset-background: #009688;
                 --legend-color: #ffffff;
                 --label-color: #ffeb3b;
-                --table-color: #198754;
+                --table-color: #0dcaf0;
                 --bs-body-color: #ffc107;
+            }
+            .dropdown-item p {
+                color: var(--color) !important;
+                font-size: 16px;
+                background: transparent;
+                text-align: center;
+                padding: 2px;
+                margin: 0;
             }
             i-upload form {
                 display: contents;
@@ -49,6 +57,37 @@
             img {
                 width: 128px;
                 height: 128px;
+            }
+            ul.appointment {
+                list-style: none;
+                display: flex;
+                background-color: rgba(0, 0, 0, 0.125);
+                width: fit-content;
+                flex-wrap: wrap;
+                flex-direction: row;
+                align-content: flex-start;
+                justify-content: center;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 10px;
+                border-radius: 4px;
+            }
+
+            ul.appointment li {
+                padding: 10px;
+                border: 2px solid #000000;
+                cursor: pointer;
+                transition: 0.3s all;
+                color: #198754;
+                background: rgba(0, 0, 0, 0.125);
+                font-weight: bold;
+                border-radius: 5px;
+            }
+
+            ul.appointment li:hover,
+            ul.appointment .active,
+            ul.appointment .onTime {
+                background-color: #fff;
             }
         </style>
     </head>
@@ -112,7 +151,6 @@
                     <div class="row">
                         <i-checkbox class="col3" label="Auto Appointment" ng-model="user0.autoAppointment"></i-checkbox>
                         <i-checkbox class="col3" label="Auto Book" ng-model="user0.autoBook"></i-checkbox>
-                        <i-datetime class="col" label="Select Book Time" ng-model="user0.bookTime"></i-datetime>
                     </div>
                 </div>
                 <div class="row">
@@ -164,7 +202,10 @@
                             <div class="row" ng-show="user.$edit == true">
                                 <i-checkbox label="Auto Appointment" ng-model="user.autoAppointment"></i-checkbox>
                                 <i-checkbox label="Auto Book" ng-model="user.autoBook"></i-checkbox>
-                                <i-datetime label="Select Book Time" ng-model="user.bookTime"></i-datetime>
+                                <hr />
+                                <ul class="appointment">
+                                    <li ng-repeat="t in user.bookTimeList" data-time="{{t.time}}" ng-class="{'active' : t.$selected == true}" ng-click="t.$selected = !t.$selected">{{t.time}}</li>
+                                </ul>
                             </div>
                         </td>
                         <td ng-show="user.$edit == true">
@@ -221,11 +262,31 @@
                         partition: 'persist:setting',
                         user_name: 'Setting',
                         title: 'Setting',
-                        mainWindowID: SOCIALBROWSER.remote.getCurrentWindow().id,
+                        mainWindowID: SOCIALBROWSER.window.id,
                         vip: true,
                         center: true,
                     });
                 };
+
+                $scope.bookTimeList = [
+                    { time: '08:00' },
+                    { time: '08:30' },
+                    { time: '09:00' },
+                    { time: '09:30' },
+                    { time: '10:00' },
+                    { time: '10:30' },
+                    { time: '11:00' },
+                    { time: '11:30' },
+                    { time: '12:00' },
+                    { time: '12:30' },
+                    { time: '13:00' },
+                    { time: '13:30' },
+                    { time: '14:00' },
+                    { time: '14:30' },
+                    { time: '15:00' },
+                    { time: '15:30' },
+                    { time: '16:00' },
+                ];
 
                 $scope.expireDate = localStorage.getItem('expireDate');
 
@@ -249,7 +310,8 @@
                 $scope.bookTypeList = [
                     { id: 1, name: 'Random Days' },
                     { id: 2, name: 'First Days' },
-                    { id: 3, name: 'Latest Days' },
+                    { id: 3, name: 'Center Days' },
+                    { id: 4, name: 'Latest Days' },
                 ];
                 $scope.visaTypeList = [
                     { id: 1, name: 'normal', display: 'Normal' },
@@ -432,7 +494,7 @@
                 $scope.runAll = function () {
                     SOCIALBROWSER.share('[TLS]');
                 };
-                $scope.user0 = { visaType: $scope.visaTypeList[0], bookType: $scope.bookTypeList[0] };
+                $scope.user0 = { visaType: $scope.visaTypeList[0], bookType: $scope.bookTypeList[0], bookTimeList: [...$scope.bookTimeList] };
                 $scope.userList = [];
                 $scope.proxyList = SOCIALBROWSER.var.proxy_list || [];
                 if ((list = localStorage.getItem('userList'))) {
@@ -441,11 +503,12 @@
                 $scope.addUser = function (user) {
                     user = user || $scope.user0;
                     $scope.userList.push({ ...user });
-                    $scope.user0 = { visaType: $scope.visaTypeList[0], bookType: $scope.bookTypeList[0] };
+                    $scope.user0 = { visaType: $scope.visaTypeList[0], bookType: $scope.bookTypeList[0], bookTimeList: [...$scope.bookTimeList] };
                     localStorage.setItem('userList', JSON.stringify($scope.userList));
                 };
                 $scope.selectUser = function (user) {
                     user.$edit = !user.$edit;
+                    user.bookTimeList = user.bookTimeList || [...$scope.bookTimeList];
                     $scope.user0 = user;
                 };
                 $scope.deleteUser = function (user) {
@@ -475,10 +538,10 @@
                         $scope.siteLoginScript +
                         $scope.TLSScript +
                         ' } ';
-                    let defaultUserAgent = SOCIALBROWSER.getRandomBrowser('pc', 'edge');
+                    let defaultUserAgent = SOCIALBROWSER.getRandomBrowser('pc', 'chrome');
 
                     SOCIALBROWSER.ipc('[open new popup]', {
-                        partition: 'ghost_' + SOCIALBROWSER.md5(user.email),
+                        partition: 'ghost_' + new Date().getTime() + '_' + SOCIALBROWSER.randomNumber(),
                         url: user.link,
                         eval: userData,
                         proxy: user.proxy,
